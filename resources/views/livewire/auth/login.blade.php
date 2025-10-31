@@ -1,58 +1,58 @@
-<x-layouts.auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Cashtify</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    @livewireStyles
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="text-center mb-4">Masuk ke Cashtify</h4>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
-            @csrf
+                    <form wire:submit.prevent="login">
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="email" wire:model="email" class="form-control" required autofocus>
+                            @error('email') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+                        <div class="mb-3">
+                            <label>Password</label>
+                            <input type="password" wire:model="password" class="form-control" required>
+                            @error('password') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
 
-            <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
-                />
+                        <div class="form-check mb-3">
+                            <input type="checkbox" wire:model="remember" class="form-check-input" id="remember">
+                            <label for="remember" class="form-check-label">Ingat saya</label>
+                        </div>
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
+                        <button type="submit" class="btn btn-primary w-100" wire:loading.attr="disabled">
+                            <span wire:loading.remove>Masuk</span>
+                            <span wire:loading>Memproses...</span>
+                        </button>
+                    </form>
+                </div>
             </div>
-
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
-
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
-            </div>
-        </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
+            <p class="text-center mt-3">
+                <a href="{{ route('landing') }}">Kembali ke Landing Page</a>
+            </p>
+        </div>
     </div>
-</x-layouts.auth>
+</div>
+
+@livewireScripts
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
