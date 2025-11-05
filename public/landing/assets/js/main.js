@@ -44,9 +44,35 @@
 	};
 
     document.addEventListener('DOMContentLoaded', function () {
-    const track = document.querySelector('.product-track');
-    track.innerHTML += track.innerHTML; // clone konten biar bisa looping mulus
-    });
+  const track = document.querySelector('.product-track');
+  const cards = Array.from(track.children);
+
+  // Gandakan elemen untuk memastikan efek loop lancar
+  track.append(...cards.map(card => card.cloneNode(true)));
+
+  let offset = 0;
+  let isPaused = false;
+  const speed = 2; // kecepatan geser
+
+  function loop() {
+    if (!isPaused) {
+      offset -= speed;
+      // Kalau sudah geser melebihi setengah lebar total track
+      if (Math.abs(offset) >= track.scrollWidth / 2) {
+        offset = 0; // reset posisi tanpa patah
+      }
+      track.style.transform = `translateX(${offset}px)`;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // Pause & resume saat hover
+  track.addEventListener('mouseenter', () => (isPaused = true));
+  track.addEventListener('mouseleave', () => (isPaused = false));
+
+  loop();
+});
+
 
     window.document.addEventListener('scroll', onScroll);
 

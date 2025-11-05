@@ -94,26 +94,29 @@ a {
     /* ===== Navbar ===== */
     .product-slider {
     overflow: hidden;
+    white-space: nowrap;
     position: relative;
     }
 
     .product-track {
     display: flex;
-    animation: scrollLoop 30s linear infinite;
+    gap: 1.5rem;
+    will-change: transform;
+    transition: transform 0.1s linear;
     }
 
     .product-card {
     flex: 0 0 auto;
-    width: 220px; /* sesuaikan ukuran kartu */
+    width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
     }
 
-    @keyframes scrollLoop {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
+    .product-card img {
+    width: 100%;
+    height: auto;
     }
 
 
