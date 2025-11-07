@@ -12,8 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('crs_id');
+            $table->dateTime('crs_time');
+            $table->unsignedBigInteger('crs_created_by')->unsigned()->nullable();
+            $table->unsignedBigInteger('crs_deleted_by')->unsigned()->nullable();
+            $table->unsignedBigInteger('crs_updated_by')->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->string('crs_sys_note')->nullable();
+
+            $table->foreign('crs_user_id')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_product_id')->references('prd_id')->on('products')->onDelete('cascade');
+
+            $table->foreign('crs_created_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
+
+            $table->renameColumn('created_at', 'crs_created_at');
+            $table->renameColumn('updated_at', 'crs_updated_at');
+            $table->renameColumn('deleted_at', 'crs_deleted_at');
         });
     }
 

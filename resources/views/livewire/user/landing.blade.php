@@ -9,22 +9,22 @@
   <title>Cashtify | Landing Page</title>
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="{{ asset('landing/assets/images/favicon.svg') }}" type="image/svg+xml" />
+  <link rel="shortcut icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/svg+xml" />
 
   <!-- Bootstrap -->
-  <link rel="stylesheet" href="{{ asset('landing/assets/css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
 
   <!-- Line Icons -->
-  <link rel="stylesheet" href="{{ asset('landing/assets/css/lineicons.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/lineicons.css') }}" />
 
   <!-- Tiny Slider -->
-  <link rel="stylesheet" href="{{ asset('landing/assets/css/tiny-slider.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/tiny-slider.css') }}" />
 
   <!-- gLightBox -->
-  <link rel="stylesheet" href="{{ asset('landing/assets/css/glightbox.min.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
 
   <!-- Main Style -->
-  <link rel="stylesheet" href="{{ asset('landing/style.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
 </head>
 
 <body>
@@ -37,7 +37,7 @@
         <div class="col-lg-12">
           <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="index.html">
-              <img src="{{ asset('landing/assets/images/white-logo.svg') }}" alt="Logo" />
+              <img src="{{ asset('assets/images/2.svg') }}" alt="Logo" class="logo" />
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNine"
               aria-controls="navbarNine" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,14 +74,14 @@
   <!-- Start header Area -->
 
     <!-- BANNER SECTION -->
-    <section class="py-4" style="scroll-margin-top: 80px; margin-top: 80px;" id="hero-area">
+    <section class="py-4" style="scroll-margin-top: 80px; margin-top: 160px;" id="hero-area">
         <div class="container">
             <h4 class="fw-bold mb-4 text-center">🔥 Produk Terpopuler</h4>
             <div class="product-slider">
             <div class="product-track d-flex">
                 @for ($i = 1; $i <= 5; $i++)
                 <div class="card mx-3 border-0 shadow-sm product-card">
-                    <img src="{{ asset('landing/assets/images/logo.svg') }}" class="card-img-top" alt="Produk {{ $i }}">
+                    <img src="{{ asset('assets/images/logo.svg') }}" class="card-img-top" alt="Produk {{ $i }}">
                     <div class="card-body text-center">
                     <h6 class="fw-semibold mb-1">Produk {{ $i }}</h6>
                     <p class="text-primary fw-bold mb-0">Rp {{ number_format(10000 * $i, 0, ',', '.') }}</p>
@@ -109,7 +109,7 @@
                     <a href="">
                         <div class="card border-0 shadow-sm h-100 p-3">
                             <div class="mb-2">
-                                <img src="{{ asset('landing/assets/images/logo.svg') }}" alt="{{ $category }}" style="height: 40px;">
+                                <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ $category }}" style="height: 40px;">
                             </div>
                             <span class="fw-semibold">{{ $category }}</span>
                         </div>
@@ -387,38 +387,8 @@
       </div>
       <!-- container -->
     </div>
-    <!--======  End Section Title Five ======-->
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 offset-lg-2 col-12">
-          <div class="clients-logos">
-            <div class="single-image">
-              <img src="assets/images/client-logo/graygrids.svg" alt="Brand Logo Images" />
-            </div>
-            <div class="single-image">
-              <img src="assets/images/client-logo/uideck.svg" alt="Brand Logo Images" />
-            </div>
-            <div class="single-image">
-              <img src="assets/images/client-logo/ayroui.svg" alt="Brand Logo Images" />
-            </div>
-            <div class="single-image">
-              <img src="assets/images/client-logo/lineicons.svg" alt="Brand Logo Images" />
-            </div>
-            <div class="single-image">
-              <img src="assets/images/client-logo/tailwindtemplates.svg" alt="Brand Logo Images" />
-            </div>
-            <div class="single-image">
-              <img src="assets/images/client-logo/ecomhtml.svg" alt="Brand Logo Images" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- End Brand Area -->
-
   <!-- ========================= map-section end ========================= -->
-  <section class="map-section map-style-9">
+  <section class="map-section map-style-9" style="margin-top: 10px;">
     <div class="map-container">
       <object style="border:0; height: 500px; width: 100%;"
         data="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3102.7887109309127!2d-77.44196278417968!3d38.95165507956235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDU3JzA2LjAiTiA3N8KwMjYnMjMuMiJX!5e0!3m2!1sen!2sbd!4v1545420879707"></object>
@@ -510,10 +480,10 @@
   </a>
 
   <!--====== js ======-->
-  <script src="{{ asset('landing/assets/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('landing/assets/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('landing/assets/js/main.js') }}"></script>
-  <script src="{{ asset('landing/assets/js/tiny-slider.js') }}"></script>
+  <script src="{{ asset('js/glightbox.min.js') }}"></script>
+  <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('js/main.js') }}"></script>
+  <script src="{{ asset('js/tiny-slider.js') }}"></script>
 
   <script>
 

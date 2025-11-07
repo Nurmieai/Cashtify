@@ -12,8 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accountings', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('act_id');
+            $table->unsignedBigInteger('act_user_id')->unsigned();
+            $table->string('act_exel_url');
+            $table->date('act_period_from');
+            $table->date('act_period_to');
+            $table->integer('act_total_sales');
+            $table->integer('act_total_items_sold');
             $table->timestamps();
+            $table->unsignedBigInteger('act_created_by')->unsigned()->nullable();
+            $table->unsignedBigInteger('act_deleted_by')->unsigned()->nullable();
+            $table->unsignedBigInteger('act_updated_by')->unsigned()->nullable();
+            $table->softDeletes();
+            $table->string('act_sys_note')->nullable();
+
+            $table->foreign('act_user_id')->references('usr_id')->on('users')->onDelete('cascade');
+
+            $table->foreign('act_created_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('act_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('act_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
+
+            $table->renameColumn('created_at', 'act_created_at');
+            $table->renameColumn('updated_at', 'act_updated_at');
+            $table->renameColumn('deleted_at', 'act_deleted_at');
         });
     }
 

@@ -14,7 +14,7 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('landing');
+        return view('livewire.user.landing');
     }
 
     // Menampilkan form login

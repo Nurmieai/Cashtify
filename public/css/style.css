@@ -476,6 +476,10 @@ p {
     padding: 10px 0;
   }
 }
+.logo{
+    width: 220px;
+    height: 80px;
+}
 .navbar-area.navbar-nine .navbar-brand {
   margin: 0;
 }

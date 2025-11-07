@@ -21,6 +21,16 @@ return new class extends Migration
             $table->unsignedBigInteger('prd_deleted_by')->unsigned()->nullable();
             $table->unsignedBigInteger('prd_updated_by')->unsigned()->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->string('usr_sys_note')->nullable();
+
+            $table->foreign('prd_created_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('prd_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('prd_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
+
+            $table->renameColumn('updated_at', 'usr_updated_at');
+            $table->renameColumn('created_at', 'usr_created_at');
+            $table->renameColumn('deleted_at', 'usr_deleted_at');
         });
     }
 
