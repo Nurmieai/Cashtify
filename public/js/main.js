@@ -92,3 +92,21 @@
     "use strict";
 
 }) ();
+
+const darkToggle = document.getElementById('darkModeToggle');
+  darkToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const icon = darkToggle.querySelector('i');
+    icon.classList.toggle('bi-moon');
+    icon.classList.toggle('bi-sun');
+  });
+
+  // Navbar scroll effect
+  window.addEventListener('scroll', function () {
+    const navbar = document.querySelector('.navbar-nine');
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });

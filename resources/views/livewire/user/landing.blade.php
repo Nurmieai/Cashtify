@@ -9,13 +9,14 @@
   <title>Cashtify | Landing Page</title>
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/svg+xml" />
+  <link rel="shortcut icon" href="{{ asset('assets/images/1.svg') }}" type="image/svg+xml" />
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Line Icons -->
-  <link rel="stylesheet" href="{{ asset('css/lineicons.css') }}" />
+  <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css"/>
 
   <!-- Tiny Slider -->
   <link rel="stylesheet" href="{{ asset('css/tiny-slider.css') }}" />
@@ -24,49 +25,61 @@
   <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
 
   <!-- Main Style -->
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
 </head>
 
 <body>
 
   <!--====== NAVBAR NINE PART START ======-->
-
-  <section class="navbar-area navbar-nine">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <nav class="navbar navbar-expand-lg">
-            <a class="navbar-brand" href="index.html">
-              <img src="{{ asset('assets/images/2.svg') }}" alt="Logo" class="logo" />
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNine"
-              aria-controls="navbarNine" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="toggler-icon"></span>
-              <span class="toggler-icon"></span>
-              <span class="toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse sub-menu-bar" id="navbarNine">
-              <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                  <a class="page-scroll active" href="#hero-area">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a class="page-scroll" href="#pricing">Pricing</a>
-                </li>
-                <li class="nav-item">
-                  <a class="page-scroll" href="#contact">Maps</a>
-                </li>
-              </ul>
+<section class="navbar-area navbar-nine py-3">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-12">
+        <nav class="navbar navbar-expand-lg">
+          <!-- Logo -->
+          <a class="navbar-brand d-flex align-items-center" href="/">
+            <div class="logo-wrapper">
+                <img src="{{ asset('assets/images/2.svg') }}" alt="Logo" class="logo" style="margin-right: 100px;"/>
             </div>
-          </nav>
-          <!-- navbar -->
-        </div>
+          </a>
+
+          <!-- Toggler -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNine"
+            aria-controls="navbarNine" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="toggler-icon"></span>
+            <span class="toggler-icon"></span>
+            <span class="toggler-icon"></span>
+          </button>
+
+          <!-- Navbar Menu -->
+          <div class="collapse navbar-collapse sub-menu-bar" id="navbarNine">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="#blog">Features</a></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="hero-area" id="menuDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
+                <ul class="dropdown-menu" aria-labelledby="menuDropdown">
+                    <li><a class="dropdown-item" href="call-action">Transaksi</a></li>
+                  <li><a class="dropdown-item" href="blog">Produk</a></li>
+                  <li><a class="dropdown-item" href="maps">Pencatatan</a></li>
+                </ul>
+              </li>
+              <li class="nav-item"><a class="nav-link" href="#">Maps</a></li>
+            </ul>
+
+            <!-- Buttons -->
+            <div class="nav-actions d-flex align-items-center gap-2 flex-wrap ms-auto">
+                <a href="/login" class="btn btn-outline-light btn-sm fw-semibold">LOGIN</a>
+                <a href="/register" class="btn btn-light text-danger btn-sm fw-semibold">SIGN UP</a>
+            </div>
+          </div>
+        </nav>
       </div>
-      <!-- row -->
     </div>
-    <!-- container -->
-  </section>
+  </div>
+</section>
+
 
   <!--====== NAVBAR NINE PART ENDS ======-->
 
@@ -74,7 +87,7 @@
   <!-- Start header Area -->
 
     <!-- BANNER SECTION -->
-    <section class="py-4" style="scroll-margin-top: 80px; margin-top: 160px;" id="hero-area">
+    <section class="py-4" style="scroll-margin-top: 80px; margin-top: 130px;" id="hero-area">
         <div class="container">
             <h4 class="fw-bold mb-4 text-center">🔥 Produk Terpopuler</h4>
             <div class="product-slider">
