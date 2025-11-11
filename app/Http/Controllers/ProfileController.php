@@ -17,7 +17,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = Auth::user();
+        $user = \App\Models\User::where('usr_id', Auth::id())->firstOrFail();
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -42,16 +42,18 @@ class ProfileController extends Controller
 
         // === Aksi update profil ===
         if ($request->hasFile('photo')) {
-        // hapus foto lama
-        if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
-            unlink(public_path($user->usr_card_url));
+            // hapus foto lama
+            if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
+                unlink(public_path($user->usr_card_url));
+            }
+
+            // simpan foto baru
+            $filename = 'user_' . $user->usr_id . '.' . $request->photo->extension();
+            $path = $request->photo->storeAs('assets/images/profile', $filename, 'public');
+
+            $user->usr_card_url = 'storage/' . $path;
         }
 
-        // simpan baru
-        $filename = 'user_' . $user->usr_id . '.' . $request->photo->extension();
-        $path = $request->photo->storeAs('assets/images/profile', $filename, 'public');
-        $user->usr_card_url = 'storage/' . $path; // <- penting, tanpa "public/"
-    }
 
 
         // update data lain
@@ -63,6 +65,7 @@ class ProfileController extends Controller
         }
 
         $user->save();
+        Auth::setUser($user);
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
