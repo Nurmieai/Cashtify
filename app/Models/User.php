@@ -2,86 +2,80 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Traits\Blameable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, SoftDeletes;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, SoftDeletes, Blameable, HasRoles;
 
-    // === Custom timestamp fields (menyesuaikan migration) ===
+    protected $guarded = ['id', 'timestamps'];
+    protected $primaryKey = 'usr_id';
+    protected $blameablePrefix = 'usr_';
+
     const CREATED_AT = 'usr_created_at';
     const UPDATED_AT = 'usr_updated_at';
     const DELETED_AT = 'usr_deleted_at';
 
     /**
-     * Kolom yang bisa diisi massal.
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'usr_bio',
-        'usr_activation',
-        'usr_card_url',
-        'usr_img_public_id',
-        'usr_sys_note',
-        'usr_created_by',
-        'usr_updated_by',
-        'usr_deleted_by',
-    ];
 
     /**
-     * Kolom yang disembunyikan ketika model di-serialize.
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
      */
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
     ];
 
     /**
-     * Casting kolom otomatis.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'usr_activation' => 'boolean',
-        'password' => 'hashed',
-    ];
-
-    /**
-     * Getter inisial nama (misal “Nabil Halan" → “NH”)
-     */
-    public function initials(): string
+    protected function casts(): array
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
-            ->implode('');
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
-    /**
-     * Relasi self-referencing (created/updated/deleted by)
-     */
-    public function createdBy()
-    {
-        return $this->belongsTo(User::class, 'usr_created_by');
+    public function login(): HasMany {
+        return $this->hasMany(User::class, 'usr_lg_user_id', 'usr_id');
     }
 
-    public function updatedBy()
+    public function transactions(): HasMany
     {
-        return $this->belongsTo(User::class, 'usr_updated_by');
+        return $this->hasMany(Transaction::class, 'trx_user_id', 'usr_id');
     }
 
-    public function deletedBy()
+
+    public function created_by(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'usr_deleted_by');
+        return $this->belongsTo(User::class, 'usr_created_by', 'usr_id');
+    }
+    public function updated_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'usr_updated_by', 'usr_id');
+    }
+    public function deleted_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'usr_deleted_by', 'usr_id');
     }
 }

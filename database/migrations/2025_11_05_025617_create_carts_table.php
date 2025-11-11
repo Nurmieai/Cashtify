@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->bigIncrements('crs_id');
             $table->dateTime('crs_time');
+            $table->unsignedBigInteger('crs_user_id')->nullable();
+            $table->unsignedBigInteger('crs_product_id')->nullable();
+
             $table->unsignedBigInteger('crs_created_by')->unsigned()->nullable();
             $table->unsignedBigInteger('crs_deleted_by')->unsigned()->nullable();
             $table->unsignedBigInteger('crs_updated_by')->unsigned()->nullable();

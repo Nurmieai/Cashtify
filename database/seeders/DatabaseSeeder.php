@@ -14,18 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $this->call([
-            RoleSeeder::class
-        ]);
-
-        $owner = User::firstOrCreate(
-            ['email' => 'atmin@csh.com'],
-            [
-                'name' => 'Atmint Cashtify',
-                'password' => Hash::make('12345'),
-            ]
-        );
+        RoleSeeder::class,
+        UserSeeder::class,
+        ProductSeeder::class,
+        CartSeeder::class,
+        TransactionSeeder::class,
+        AccountingSeeder::class,
+    ]);
     }
 }

@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+
+class ProfileController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+        return view('livewire.user.profile', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => "required|email|unique:users,email,{$user->usr_id},usr_id",
+            'password' => 'nullable|min:6|confirmed',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        // Update foto profil kalau ada upload baru
+        if ($request->hasFile('photo')) {
+            if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
+                unlink(public_path($user->usr_card_url));
+            }
+
+            $filename = 'user_' . $user->usr_id . '.' . $request->photo->extension();
+            $path = $request->photo->storeAs('assets/images/profile', $filename, 'public');
+            $user->usr_card_url = 'storage/' . $path;
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+}
