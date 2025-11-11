@@ -42,15 +42,17 @@ class ProfileController extends Controller
 
         // === Aksi update profil ===
         if ($request->hasFile('photo')) {
-            // hapus foto lama
-            if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
-                unlink(public_path($user->usr_card_url));
-            }
-
-            $filename = 'user_' . $user->usr_id . '.' . $request->photo->extension();
-            $path = $request->photo->storeAs('assets/images/profile', $filename, 'public');
-            $user->usr_card_url = 'storage/' . $path;
+        // hapus foto lama
+        if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
+            unlink(public_path($user->usr_card_url));
         }
+
+        // simpan baru
+        $filename = 'user_' . $user->usr_id . '.' . $request->photo->extension();
+        $path = $request->photo->storeAs('assets/images/profile', $filename, 'public');
+        $user->usr_card_url = 'storage/' . $path; // <- penting, tanpa "public/"
+    }
+
 
         // update data lain
         $user->name = $request->name;

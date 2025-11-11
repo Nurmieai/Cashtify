@@ -51,29 +51,41 @@
                     @endphp
 
                     <div class="dropdown">
-                        <a class="btn btn-outline-light btn-sm fw-semibold dropdown-toggle d-flex align-items-center"
+                        <a class="btn btn-outline-light btn-sm fw-semibold dropdown-toggle d-flex align-items-center gap-2 px-3 py-1"
                         href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="{{ $profileImage }}"
-                                alt="User"
-                                class="rounded-circle me-2 object-fit-cover"
-                                style="width: 28px; height: 28px;">
-                            {{ strtoupper($user->name) }}
+                            <img src="{{ asset(Auth::user()->usr_card_url ?? 'assets/images/header/user_placeholder.jpg') }}"
+                                class="rounded-circle shadow-sm object-fit-cover border border-light"
+                                alt="{{ Auth::user()->name }}"
+                                width="32" height="32"
+                                style="object-fit: cover;">
+                            <span class="text-uppercase small">{{ Auth::user()->name }}</span>
                         </a>
 
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2"
+                            aria-labelledby="userDropdown" style="min-width: 180px; border-radius: 10px;">
                             <li>
-                                <a class="dropdown-item" href="{{ route('profile') }}">Profil Saya</a>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('profile') }}">
+                                    <i class="bi bi-person-circle"></i> Profil Saya
+                                </a>
                             </li>
 
-                            @if ($user->hasRole('admin'))
-                                <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard Admin</a></li>
+                            @if (Auth::user()->hasRole('admin'))
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
+                                        <i class="bi bi-speedometer2 text-muted"></i> Dashboard Admin
+                                    </a>
+                                </li>
                             @endif
 
                             <li><hr class="dropdown-divider"></li>
+
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">Logout</button>
+                                    <button type="submit"
+                                            class="dropdown-item d-flex align-items-center gap-2 fw-semibold">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </button>
                                 </form>
                             </li>
                         </ul>
