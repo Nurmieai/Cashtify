@@ -37,17 +37,14 @@
 
             <!-- Buttons -->
             <div class="nav-actions d-flex align-items-center gap-2 flex-wrap ms-auto">
-                {{-- Kalau belum login --}}
                 @guest
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm fw-semibold">LOGIN</a>
                     <a href="{{ route('register') }}" class="btn btn-light text-danger btn-sm fw-semibold">SIGN UP</a>
                 @endguest
 
-                {{-- Kalau sudah login --}}
                 @auth
                     @php
                         $user = Auth::user();
-                        // pakai gambar default kalau belum ada foto profil
                         $profileImage = $user->usr_card_url
                             ? asset($user->usr_card_url)
                             : asset('assets/images/default_user.png');

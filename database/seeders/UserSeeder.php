@@ -13,10 +13,10 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'usr_id' => 1,
-                'name' => 'Nabil Hakim',
+                'name' => 'Nabil',
                 'email' => 'nabil@example.com',
                 'password' => Hash::make('password123'),
-                'usr_card_url' => '/logo/user_placeholder.jpg',
+                'usr_card_url' => 'assets/images/hero-image.jpg',
                 'usr_created_at' => now(),
                 'usr_updated_at' => now(),
                 'usr_sys_note' => 'Admin utama',
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
                 'name' => 'Sofia Cantik',
                 'email' => 'sofia@example.com',
                 'password' => Hash::make('12345678'),
-                'usr_card_url' => '/logo/user_placeholder.jpg',
+                'usr_card_url' => 'assets/images/hero-image.jpg',
                 'usr_created_at' => now(),
                 'usr_updated_at' => now(),
                 'usr_sys_note' => 'User percobaan',
