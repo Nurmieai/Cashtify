@@ -1,94 +1,60 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Profil Saya - Cashtify</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@extends('layouts.app')
 
-  <style>
-    body {
-      background: #f9fafb;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .profile-container {
-      background: #fff;
-      width: 100%;
-      max-width: 700px;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      position: relative;
-    }
-
-    .back-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      text-decoration: none;
-      color: #dc3545;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .profile-pic {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #dc3545;
-      margin-bottom: 1rem;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="profile-container">
-
-    {{-- Tombol kembali --}}
-    <a href="{{ route('landing') }}" class="back-btn">
-      ← Kembali
-    </a>
-
-    <div class="text-center">
-      <img
-        src="{{ Auth::user()->usr_card_url ? asset(Auth::user()->usr_card_url) : asset('assets/images/default_user.png') }}"
-        alt="Foto Profil"
-        class="profile-pic"
-      >
-      <h4 class="mb-1">{{ Auth::user()->name }}</h4>
-      <p class="text-muted mb-3">{{ Auth::user()->email }}</p>
-
-      {{-- Form Update --}}
-      <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="text-start">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Nama</label>
-          <input type="text" name="name" value="{{ old('name', Auth::user()->name) }}" class="form-control" required>
+@section('content')
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Profil Akun</h5>
+            <a href="{{ route('landing') }}" class="btn btn-light btn-sm">Kembali</a>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Email</label>
-          <input type="email" name="email" value="{{ old('email', Auth::user()->email) }}" class="form-control" required>
+        <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <div class="text-center mb-3">
+                    <img src="{{ asset($user->usr_card_url ?? 'assets/images/default_user.png') }}"
+                         class="rounded-circle mb-2 object-fit-cover"
+                         style="width: 100px; height: 100px;">
+                    <div>
+                        <input type="file" name="photo" class="form-control form-control-sm w-auto d-inline">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Nama</label>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Password Baru</label>
+                        <input type="password" name="password" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" class="form-control">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Foto Profil</label>
-          <input type="file" name="usr_card_url" class="form-control">
+        <div class="card-footer bg-light text-muted text-end">
+            Role: <strong>{{ $user->is_admin ? 'Admin' : 'User Biasa' }}</strong>
         </div>
-
-        <div class="text-end">
-          <button type="submit" class="btn btn-danger px-4">Simpan Perubahan</button>
-        </div>
-      </form>
     </div>
-  </div>
-</body>
-</html>
+</div>
+@endsection

@@ -24,10 +24,25 @@ class ProfileController extends Controller
             'email' => "required|email|unique:users,email,{$user->usr_id},usr_id",
             'password' => 'nullable|min:6|confirmed',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'action' => 'nullable|string', // tambah ini untuk kontrol aksi foto
         ]);
 
-        // Update foto profil kalau ada upload baru
+        // === Aksi hapus foto ===
+        if ($request->action === 'delete_photo') {
+            if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
+                unlink(public_path($user->usr_card_url));
+            }
+
+            $user->usr_card_url = null;
+            $user->usr_img_public_id = null;
+            $user->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Foto profil dihapus.']);
+        }
+
+        // === Aksi update profil ===
         if ($request->hasFile('photo')) {
+            // hapus foto lama
             if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
                 unlink(public_path($user->usr_card_url));
             }
@@ -37,6 +52,7 @@ class ProfileController extends Controller
             $user->usr_card_url = 'storage/' . $path;
         }
 
+        // update data lain
         $user->name = $request->name;
         $user->email = $request->email;
 
