@@ -110,3 +110,94 @@ const darkToggle = document.getElementById('darkModeToggle');
       navbar.classList.remove('scrolled');
     }
   });
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById('photoInput');
+  const modalEl = document.getElementById('cropperModal');
+  const imageEl = document.getElementById('imageToCrop');
+  const previewEl = document.getElementById('profilePreview');
+  const cropBtn = document.getElementById('cropImageBtn');
+  let cropper;
+
+  const modal = new bootstrap.Modal(modalEl);
+
+  input?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      imageEl.src = ev.target.result;
+      modal.show();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  modalEl?.addEventListener('shown.bs.modal', () => {
+    cropper = new Cropper(imageEl, {
+      aspectRatio: 1,
+      viewMode: 1,
+      background: false,
+    });
+  });
+
+  modalEl?.addEventListener('hidden.bs.modal', () => {
+    cropper?.destroy();
+    cropper = null;
+  });
+
+  cropBtn?.addEventListener('click', () => {
+    const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+    previewEl.src = canvas.toDataURL();
+    modal.hide();
+
+    const croppedInput = document.createElement('input');
+    croppedInput.type = 'hidden';
+    croppedInput.name = 'cropped_image';
+    croppedInput.value = canvas.toDataURL('image/png');
+    document.querySelector('form').appendChild(croppedInput);
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById("photo");
+  const preview = document.getElementById("previewImage");
+
+  if (input && preview) {
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const errorMessages = window.errorMessages || null;
+    const successMessage = window.successMessage || null;
+
+    if (errorMessages) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Ups!',
+            html: errorMessages.join('<br>'),
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Oke',
+        });
+    }
+
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: successMessage,
+            confirmButtonColor: '#dc3545',
+        });
+    }
+});
+

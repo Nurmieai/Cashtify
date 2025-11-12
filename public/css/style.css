@@ -1,0 +1,91 @@
+body {
+      background: linear-gradient(135deg, #f8f9fa, #e9f5ff);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .login-card {
+      border: none;
+      border-radius: 1rem;
+      background: #fff;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .login-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #007bff, #00b4d8);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0069d9, #0096c7);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: #aaa;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .divider:not(:empty)::before {
+      margin-right: .75em;
+    }
+
+    .divider:not(:empty)::after {
+      margin-left: .75em;
+    }
+
+    .toggle-password {
+      cursor: pointer;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+
+    .social-btn {
+      border: 1px solid #ddd;
+      background: #fff;
+      transition: 0.2s;
+    }
+
+    .social-btn:hover {
+      background: #f1f5ff;
+      border-color: #007bff;
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+    }
+
+    .card {
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    button.btn-primary {
+      background: linear-gradient(135deg, #007bff, #00b4d8);
+      border: none;
+    }
+
+    button.btn-primary:hover {
+      background: linear-gradient(135deg, #0062cc, #0096c7);
+    }

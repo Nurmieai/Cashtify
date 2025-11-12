@@ -1,65 +1,67 @@
 <x-layouts.auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+  <x-slot name="title">Register</x-slot>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+  <section class="d-flex align-items-center justify-content-center" style="min-height: 100vh; background: #f8f9fa;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+          <div class="card border-0 shadow-lg rounded-4 p-4" style="background: #ffffff;">
+            <h4 class="fw-bold mb-3 text-center text-primary">Buat Akun Baru</h4>
+            <p class="text-muted text-center mb-4">Gabung dan nikmati fitur terbaik Cashtify 💸</p>
 
-        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
-            @csrf
-            <!-- Name -->
-            <flux:input
-                name="name"
-                :label="__('Name')"
-                type="text"
-                required
-                autofocus
-                autocomplete="name"
-                :placeholder="__('Full name')"
-            />
+            <form method="POST" action="{{ route('register') }}">
+              @csrf
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                type="email"
-                required
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+              <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">Nama Lengkap</label>
+                <input type="text" name="name" id="name"
+                       class="form-control form-control-lg rounded-3 @error('name') is-invalid @enderror"
+                       value="{{ old('name') }}" required autofocus>
+                @error('name')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
 
-            <!-- Password -->
-            <flux:input
-                name="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Password')"
-                viewable
-            />
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email</label>
+                <input type="email" name="email" id="email"
+                       class="form-control form-control-lg rounded-3 @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}" required>
+                @error('email')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
 
-            <!-- Confirm Password -->
-            <flux:input
-                name="password_confirmation"
-                :label="__('Confirm password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Confirm password')"
-                viewable
-            />
+              <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <input type="password" name="password" id="password"
+                       class="form-control form-control-lg rounded-3 @error('password') is-invalid @enderror"
+                       required>
+                @error('password')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
 
-            <div class="flex items-center justify-end">
-                <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
-                    {{ __('Create account') }}
-                </flux:button>
-            </div>
-        </form>
+              <div class="mb-4">
+                <label for="password_confirmation" class="form-label fw-semibold">Konfirmasi Password</label>
+                <input type="password" name="password_confirmation" id="password_confirmation"
+                       class="form-control form-control-lg rounded-3" required>
+              </div>
 
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-            <span>{{ __('Already have an account?') }}</span>
-            <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
+              <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold">
+                Daftar Sekarang
+              </button>
+
+              <p class="text-center mt-3 mb-0 text-muted">
+                Sudah punya akun?
+                <a href="{{ route('login') }}" class="text-decoration-none fw-semibold text-primary">
+                  Masuk di sini
+                </a>
+              </p>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
 </x-layouts.auth>

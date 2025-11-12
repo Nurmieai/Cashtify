@@ -1,77 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <meta name="description" content="Cashtify Landing Page" />
-  <title>Cashtify | @yield('title', 'Landing Page')</title>
+@extends('layouts.prf')
 
-  <!-- Favicon -->
-  <link rel="shortcut icon" href="{{ asset('assets/images/1.svg') }}" type="image/svg+xml" />
+@section('title', 'Profil Akun')
 
-  <!-- Bootstrap & Icons -->
-  <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.lineicons.com/4.0/lineicons.css"/>
-  <link rel="stylesheet" href="{{ asset('css/tiny-slider.css') }}" />
-  <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
-  <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
-</head>
-<div class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Profil Akun</h5>
-            <a href="{{ route('landing') }}" class="btn btn-light btn-sm">Kembali</a>
-        </div>
-
-        <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                <div class="text-center mb-3">
-                    <img src="{{ asset($user->usr_card_url ?? 'assets/images/default_user.png') }}"
-                         class="rounded-circle mb-2 object-fit-cover"
-                         style="width: 100px; height: 100px;">
-                    <div>
-                        <input type="file" name="photo" class="form-control form-control-sm w-auto d-inline">
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label>Nama</label>
-                    <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Password Baru</label>
-                        <input type="password" name="password" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label>Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" class="form-control">
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="card-footer bg-light text-muted text-end">
-            Role: <strong>{{ $user->is_admin ? 'Admin' : 'User Biasa' }}</strong>
-        </div>
+@section('content')
+<div class="container py-5">
+  <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    <!-- Header -->
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4 border-bottom">
+      <a href="{{ route('landing') }}" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+      </a>
+      <h5 class="mb-0 fw-semibold text-danger"><i class="bi bi-person-circle me-2"></i>Profil Akun</h5>
+      <div></div>
     </div>
-</div>
 
+    <!-- Body -->
+    <div class="card-body p-4">
+      <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
+        @csrf
+        @method('PUT')
+
+        <!-- Foto -->
+        <div class="text-center mb-4 position-relative">
+          <div class="position-relative d-inline-block">
+            <img id="previewImage"
+                 src="{{ asset($user->usr_card_url ?? 'assets/images/default_user.png') }}"
+                 class="rounded-circle border border-3 border-light shadow-sm object-fit-cover"
+                 style="width:120px; height:120px; object-fit:cover;">
+            <label for="photo" class="position-absolute bottom-0 end-0 bg-danger text-white rounded-circle p-2 shadow-sm"
+                   style="cursor:pointer;">
+              <i class="bi bi-camera"></i>
+            </label>
+            <input type="file" name="photo" id="photo" class="d-none" accept="image/*">
+          </div>
+        </div>
+
+        <!-- Nama -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-secondary">Nama</label>
+          <input type="text" name="name" class="form-control rounded-3 shadow-sm"
+                 value="{{ old('name', $user->name) }}" required>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-secondary">Email</label>
+          <input type="email" name="email" class="form-control rounded-3 shadow-sm"
+                 value="{{ old('email', $user->email) }}" required>
+        </div>
+
+        <!-- Password -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-secondary">Password Baru</label>
+            <input type="password" name="password" class="form-control rounded-3 shadow-sm"
+                   placeholder="Kosongkan jika tidak diganti">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-secondary">Konfirmasi Password</label>
+            <input type="password" name="password_confirmation" class="form-control rounded-3 shadow-sm">
+          </div>
+        </div>
+
+        <!-- Tombol -->
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm">
+            <i class="bi bi-save me-1"></i> Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer bg-light text-end text-secondary py-2 px-4">
+      Role: <strong>{{ $user->is_admin ? 'Admin' : 'Pembeli' }}</strong>
+    </div>
+  </div>
+</div>
+@endsection

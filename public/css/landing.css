@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
+
 /*===========================
   COMMON css
 ===========================*/
@@ -446,6 +448,48 @@ p {
 }
 
 
+.card {
+  border-radius: 1rem;
+}
+
+#profilePreview:hover {
+  transform: scale(1.03);
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #007bff, #00b4d8);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+textarea {
+  resize: none;
+}
+
+.modal-content {
+  border-radius: 1rem;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #0056b3, #00b4d8);
+  }
+  .btn-gradient-primary {
+    background: linear-gradient(90deg, #007bff, #00b4d8);
+    border: none;
+    color: #fff;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+  .btn-gradient-primary:hover {
+    opacity: .9;
+  }
+
+
 /*===========================
   NAVBAR css
 ===========================*/
@@ -514,6 +558,10 @@ p {
   transform: translateY(-5px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   border-color: #9ca3af; /* pas hover jadi lebih gelap */
+}
+
+.product-card .text-primary {
+  font-family: 'Poppins', sans-serif;
 }
 
 .card.product-card {

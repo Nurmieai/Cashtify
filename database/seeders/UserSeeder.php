@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
             ['usr_id' => 1],
             [
                 'name' => 'Nabil',
-                'email' => 'nabil@example.com',
+                'email' => 'nabil@mine.com',
                 'password' => Hash::make('12345'),
                 'usr_card_url' => 'assets/images/header/hero-image.jpg',
                 'usr_sys_note' => 'Admin utama',

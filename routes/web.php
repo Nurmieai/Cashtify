@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
