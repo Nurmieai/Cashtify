@@ -18,12 +18,12 @@
   <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {{-- Panggil navbar component --}}
     <x-layouts.navbar />
 
     {{-- Konten halaman --}}
-    <main>
+    <main class="flex-fill">
         {{ $slot }}
     </main>
 

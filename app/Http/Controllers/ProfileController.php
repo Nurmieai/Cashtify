@@ -22,13 +22,12 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => "required|email|unique:users,email,{$user->usr_id},usr_id",
+            'email' => ['required','regex:/^[a-zA-Z0-9._%+-]+@(gmail\.com|mine\.com|keren\.com)$/'],
             'password' => 'nullable|min:5|confirmed',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'action' => 'nullable|string',
         ]);
 
-        // === Aksi hapus foto ===
         if ($request->action === 'delete_photo') {
             if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
                 unlink(public_path($user->usr_card_url));
@@ -39,7 +38,6 @@ class ProfileController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Foto profil dihapus.']);
         }
 
-        // === Update Foto Baru ===
         if ($request->hasFile('photo')) {
             if ($user->usr_card_url && file_exists(public_path($user->usr_card_url))) {
                 unlink(public_path($user->usr_card_url));
@@ -49,11 +47,9 @@ class ProfileController extends Controller
             $user->usr_card_url = 'storage/' . $path;
         }
 
-        // === Update Data ===
         $user->name = $request->name;
         $user->email = $request->email;
 
-        // hanya update password kalau diisi
         if (!empty($request->password)) {
             $user->password = Hash::make($request->password);
         }

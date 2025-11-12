@@ -5,7 +5,6 @@
 @section('content')
 <div class="container py-5">
   <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-    <!-- Header -->
     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 px-4 border-bottom">
       <a href="{{ route('landing') }}" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm">
         <i class="bi bi-arrow-left me-1"></i> Kembali
@@ -14,13 +13,32 @@
       <div></div>
     </div>
 
-    <!-- Body -->
     <div class="card-body p-4">
+
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
       <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
         @csrf
         @method('PUT')
 
-        <!-- Foto -->
         <div class="text-center mb-4 position-relative">
           <div class="position-relative d-inline-block">
             <img id="previewImage"
