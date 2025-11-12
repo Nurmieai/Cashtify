@@ -503,6 +503,87 @@ p {
   z-index: -1;
 }
 
+.product-card {
+  border: 1.5px solid #d1d5db; /* abu-abu sedang */
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+  background: #fff;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  border-color: #9ca3af; /* pas hover jadi lebih gelap */
+}
+
+.card.product-card {
+  border: 2px solid #444444 !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  box-shadow: 0 4px 10px rgba(37, 37, 37, 0.541)!important;
+  transition: all 0.25s ease-in-out;
+}
+
+.card.product-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.842);
+  transform: translateY(-4px);
+}
+
+
+
+.product-card .card-body {
+  padding: 1rem 1.25rem;
+}
+
+.product-card h6 {
+  font-size: 1rem; /* sedikit lebih besar */
+  font-weight: 600;
+  color: #111827;
+}
+
+.product-card p.text-primary {
+  font-size: 0.95rem;
+}
+
+.product-card .badge {
+  font-size: 0.75rem;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
+}
+
+/* Atur jarak antar produk supaya presisi di tengah */
+.gap-4 {
+  gap: 2rem !important;
+}
+
+/* Responsif */
+@media (max-width: 992px) {
+  .product-card {
+    width: 280px;
+  }
+}
+
+/* RESPONSIVE MOBILE */
+@media (max-width: 768px) {
+  .row.justify-content-center {
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  .product-card {
+    width: 100%;
+    max-width: 3600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* LAYAR SANGAT KECIL (HP MINI) */
+@media (max-width: 480px) {
+  .product-card {
+    max-width: 300px;
+  }
+}
 
 .navbar-area.navbar-nine .logo {
   height: 48px;

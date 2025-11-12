@@ -1,33 +1,49 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use Livewire\Volt\Volt;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 
-// Halaman utama / landing
-Route::get('/', [AuthController::class, 'landing'])->name('landing');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-});
-// Route login & register (hanya untuk guest)
+// =====================================================================
+// 🌍 PUBLIC ROUTES
+// =====================================================================
+
+// Landing (daftar produk)
+Route::get('/', [ProductController::class, 'index'])->name('landing');
+
+
+// =====================================================================
+// 🔒 AUTH ROUTES (Guest Only)
+// =====================================================================
 Route::middleware('guest')->group(function () {
+    // Login
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
+    // Register
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
-// Dashboard (hanya untuk user yang sudah login)
-Route::get('/dashboard', [AuthController::class, 'dashboard'])
-    ->middleware('auth')
-    ->name('dashboard');
 
-// Logout (hanya untuk user login)
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
-    ->name('logout');
+// =====================================================================
+// 👤 USER ROUTES (Auth Only)
+// =====================================================================
+Route::middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
