@@ -5,39 +5,46 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Kamu — Penjual/Admin
-        $nabil = User::firstOrCreate(
-            ['usr_id' => 1],
+        $penjualRole = Role::firstOrCreate([
+            'name' => 'Penjual',
+        ]);
+
+        $pembeliRole = Role::firstOrCreate([
+            'name' => 'Pembeli',
+        ]);
+
+        $penjual = User::firstOrCreate(
+            ['usr_id' => 1], // PK kamu custom
             [
-                'name' => 'Nabil',
-                'email' => 'nabil@mine.com',
+                'name' => 'Penjual Utama',
+                'email' => 'admin@kasir.com',
                 'password' => Hash::make('12345'),
                 'usr_card_url' => 'assets/images/header/hero-image.jpg',
-                'usr_sys_note' => 'Penjual / Admin utama',
+                'usr_sys_note' => 'Penjual / Admin utama sistem kasir',
                 'usr_created_at' => now(),
                 'usr_updated_at' => now(),
             ]
         );
-        $nabil->assignRole('Penjual');
+        $penjual->assignRole($penjualRole);
 
-        // User percobaan — Pembeli
-        $sofia = User::firstOrCreate(
+        $pembeli = User::firstOrCreate(
             ['usr_id' => 2],
             [
-                'name' => 'Sofia Cantik',
-                'email' => 'sofia@mine.com',
+                'name' => 'Pembeli Contoh',
+                'email' => 'pembeli@kasir.com',
                 'password' => Hash::make('12345'),
                 'usr_card_url' => 'assets/images/header/hero-image.jpg',
-                'usr_sys_note' => 'User percobaan',
+                'usr_sys_note' => 'User pembeli standar',
                 'usr_created_at' => now(),
                 'usr_updated_at' => now(),
             ]
         );
-        $sofia->assignRole('Pembeli');
+        $pembeli->assignRole($pembeliRole);
     }
 }

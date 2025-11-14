@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('usr_img_public_id')->nullable();
             $table->rememberToken();
 
-            // langsung pakai penamaan final
             $table->timestamp('usr_created_at')->nullable();
             $table->timestamp('usr_updated_at')->nullable();
             $table->timestamp('usr_deleted_at')->nullable();

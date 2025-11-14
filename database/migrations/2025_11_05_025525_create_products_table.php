@@ -17,7 +17,7 @@ return new class extends Migration
         $table->text('prd_description');
         $table->enum('prd_status', ['tersedia', 'tidak tersedia']);
         $table->integer('prd_price');
-        $table->string('prd_card_url')->nullable(); // path gambar
+        $table->string('prd_card_url')->nullable();
         $table->unsignedBigInteger('prd_created_by')->nullable();
         $table->unsignedBigInteger('prd_deleted_by')->nullable();
         $table->unsignedBigInteger('prd_updated_by')->nullable();

@@ -19,6 +19,26 @@ return new class extends Migration
             $table->date('act_period_to');
             $table->integer('act_total_sales');
             $table->integer('act_total_items_sold');
+
+
+            $table->integer('act_midtrans_total_transactions')->default(0);
+
+            $table->integer('act_midtrans_total_amount')->default(0);
+
+            $table->json('act_midtrans_transaction_ids')->nullable();
+
+
+            $table->integer('act_total_shipments')->default(0);
+
+            $table->integer('act_total_shipping_cost')->default(0);
+
+            $table->json('act_shipments_json')->nullable();
+
+
+            $table->integer('act_total_income')->default(0);
+            $table->integer('act_total_expense')->default(0);
+
+
             $table->timestamps();
             $table->unsignedBigInteger('act_created_by')->unsigned()->nullable();
             $table->unsignedBigInteger('act_deleted_by')->unsigned()->nullable();
@@ -26,8 +46,8 @@ return new class extends Migration
             $table->softDeletes();
             $table->string('act_sys_note')->nullable();
 
-            $table->foreign('act_user_id')->references('usr_id')->on('users')->onDelete('cascade');
 
+            $table->foreign('act_user_id')->references('usr_id')->on('users')->onDelete('cascade');
             $table->foreign('act_created_by')->references('usr_id')->on('users')->onDelete('cascade');
             $table->foreign('act_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
             $table->foreign('act_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
@@ -39,7 +59,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse migrations.
      */
     public function down(): void
     {
