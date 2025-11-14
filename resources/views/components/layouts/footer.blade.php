@@ -1,5 +1,5 @@
-<footer class="bg-danger text-white py-3 mt-auto">
+<footer class="text-white py-3 mt-auto" style="background-color: #c82333;">
   <div class="container text-center">
-    <small>© {{ date('Y') }} Cashtify — Semua hak dilindungi</small>
+    <small>© 2021 Cashtify — Semua hak dilindungi</small>
   </div>
 </footer>

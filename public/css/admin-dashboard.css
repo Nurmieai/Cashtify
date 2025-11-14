@@ -1,0 +1,22 @@
+/* Basic additions to make dashboard lebih 'premium' tanpa override Bootstrap
+terlalu banyak */
+:root{
+--accent: #4f46e5; /* indigo-ish */
+}
+body{
+background: linear-gradient(180deg,#f8fafc 0%, #ffffff 100%);
+}
+.icon-box{
+width:56px; height:56px; display:inline-flex; align-items:center; justifycontent:center; font-size:22px;
+}
+.card{ border-radius: 12px; }
+/* subtle hover */
+.card:hover{ transform: translateY(-4px); transition: transform .18s ease; }
+/* Navbar tweaks */
+.navbar .form-control{ border-radius: 9999px; }
+/* Responsive tweaks for small screens */
+@media (max-width: 576px){
+.navbar .form-control{ width:100%; }
+}
+/* Table small */
+.table td, .table th{ vertical-align: middle; }

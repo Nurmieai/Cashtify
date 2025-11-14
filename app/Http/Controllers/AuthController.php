@@ -4,19 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function landing()
     {
-        // Kalau sudah login dan bukan admin, tetap di landing
-        // Kalau admin, arahkan ke dashboard
-        if (Auth::check()) {
-            if (Auth::user()->is_admin) {
-                return redirect()->route('dashboard');
-            }
+        if (Auth::check() && Auth::user()->hasRole('Penjual')) {
+            return redirect()->route('dashboard');
         }
 
         return view('livewire.user.landing');
@@ -25,11 +21,12 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         if (Auth::check()) {
-            if (Auth::user()->is_admin) {
+
+            if (Auth::user()->hasRole('Penjual')) {
                 return redirect()->route('dashboard');
-            } else {
-                return redirect()->route('landing');
             }
+
+            return redirect()->route('landing');
         }
 
         return view('livewire.auth.login');
@@ -43,14 +40,20 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
 
-            // Bedakan berdasarkan role
-            if (Auth::user()->is_admin) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+
+            // REDIRECT BERDASARKAN ROLE
+            if ($user->hasRole('Penjual')) {
                 return redirect()->route('dashboard');
-            } else {
+            }
+
+            if ($user->hasRole('Pembeli')) {
                 return redirect()->route('landing');
             }
+
+            return redirect()->route('landing');
         }
 
         return back()->withErrors([
@@ -71,7 +74,10 @@ class AuthController extends Controller
     {
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
+            'email'    => [
+                'required',
+                'regex:/^[a-zA-Z0-9._%+-]+@(gmail\.com|mine\.com|keren\.com)$/'
+            ],
             'password' => ['required', 'confirmed', 'min:5'],
         ]);
 
@@ -80,8 +86,10 @@ class AuthController extends Controller
             'email'         => $request->email,
             'password'      => Hash::make($request->password),
             'usr_created_by'=> null,
-            'is_admin'      => false, // default user biasa
         ]);
+
+        // DEFAULT ROLE PEMBELI
+        $user->assignRole('Pembeli');
 
         Auth::login($user);
 
@@ -90,12 +98,11 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        // Hanya admin yang boleh ke dashboard
-        if (!Auth::check() || !Auth::user()->is_admin) {
+        if (!Auth::check() || !Auth::user()->hasRole('Penjual')) {
             return redirect()->route('landing');
         }
 
-        return view('dashboard');
+        return view('livewire.admin.dashboard');
     }
 
     public function logout(Request $request)

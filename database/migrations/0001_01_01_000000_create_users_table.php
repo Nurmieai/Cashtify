@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('usr_id');
+
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -20,20 +21,21 @@ return new class extends Migration
             $table->string('usr_card_url')->nullable();
             $table->string('usr_img_public_id')->nullable();
             $table->rememberToken();
-            $table->timestamps();
-            $table->unsignedBigInteger('usr_created_by')->unsigned()->nullable();
-            $table->unsignedBigInteger('usr_deleted_by')->unsigned()->nullable();
-            $table->unsignedBigInteger('usr_updated_by')->unsigned()->nullable();
-            $table->softDeletes();
+
+            // langsung pakai penamaan final
+            $table->timestamp('usr_created_at')->nullable();
+            $table->timestamp('usr_updated_at')->nullable();
+            $table->timestamp('usr_deleted_at')->nullable();
+
+            $table->unsignedBigInteger('usr_created_by')->nullable();
+            $table->unsignedBigInteger('usr_updated_by')->nullable();
+            $table->unsignedBigInteger('usr_deleted_by')->nullable();
+
             $table->string('usr_sys_note')->nullable();
 
             $table->foreign('usr_created_by')->references('usr_id')->on('users')->onDelete('cascade');
             $table->foreign('usr_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
             $table->foreign('usr_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
-
-            $table->renameColumn('updated_at', 'usr_updated_at');
-            $table->renameColumn('created_at', 'usr_created_at');
-            $table->renameColumn('deleted_at', 'usr_deleted_at');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

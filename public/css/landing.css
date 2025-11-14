@@ -539,6 +539,7 @@ textarea {
 .navbar-area {
   position: relative;
   z-index: 1000; /* pastikan di atas elemen lain */
+  border: 1px solid #d1d5db; /* abu-abu sedang */
 }
 
 .navbar-area::after {
@@ -551,6 +552,7 @@ textarea {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.18), transparent);
   pointer-events: none; /* biar nggak ganggu klik */
   z-index: -1;
+  border-color: #9ca3af; /* pas hover jadi lebih gelap */
 }
 
 .product-card {

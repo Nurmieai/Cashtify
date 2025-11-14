@@ -55,7 +55,6 @@
                         href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="{{ asset(Auth::user()->usr_card_url ?? 'assets/images/header/user_placeholder.jpg') }}"
                                 class="rounded-circle shadow-sm object-fit-cover border border-light"
-                                alt="{{ Auth::user()->name }}"
                                 width="32" height="32"
                                 style="object-fit: cover;">
                             <span class="text-uppercase small">{{ Auth::user()->name }}</span>
