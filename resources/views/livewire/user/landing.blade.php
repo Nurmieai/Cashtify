@@ -36,13 +36,11 @@
                         style="cursor: pointer; transition: all 0.25s ease-in-out; border-color: #e5e7eb;">
 
                         <div class="card-image-wrapper p-2">
-  <img src="{{ asset('assets/images/logo.svg') }}"
-       alt="{{ $product->prd_name }}"
-       class="card-img-top rounded-3"
-       style="object-fit: contain; height: 200px; width: 100%;">
-</div>
-
-
+                            <img src="{{ asset('assets/images/logo.svg') }}"
+                                alt="{{ $product->prd_name }}"
+                                class="card-img-top rounded-3"
+                                style="object-fit: contain; height: 200px; width: 100%;">
+                        </div>
                     <div class="card-body d-flex flex-column justify-content-between">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="text-start">

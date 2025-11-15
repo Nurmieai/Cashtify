@@ -64,14 +64,14 @@
                             aria-labelledby="userDropdown" style="min-width: 180px; border-radius: 10px;">
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('profile') }}">
-                                    <i class="bi bi-person-circle"></i> Profil Saya
+                                    <i class="bi bi-person-circle"></i>Profil Saya
                                 </a>
                             </li>
 
                             @if (Auth::user()->hasRole('admin'))
                                 <li>
                                     <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
-                                        <i class="bi bi-speedometer2 text-muted"></i> Dashboard Admin
+                                        <i class="bi bi-speedometer2 text-muted"></i>Dashboard Admin
                                     </a>
                                 </li>
                             @endif
@@ -83,7 +83,7 @@
                                     @csrf
                                     <button type="submit"
                                             class="dropdown-item d-flex align-items-center gap-2 fw-semibold">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                        <i class="bi bi-box-arrow-right"></i> Keluar
                                     </button>
                                 </form>
                             </li>

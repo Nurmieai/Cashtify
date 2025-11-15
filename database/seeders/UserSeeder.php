@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             ['usr_id' => 1], // PK kamu custom
             [
                 'name' => 'Penjual Utama',
-                'email' => 'admin@kasir.com',
+                'email' => 'admin@mine.com',
                 'password' => Hash::make('12345'),
                 'usr_card_url' => 'assets/images/header/hero-image.jpg',
                 'usr_sys_note' => 'Penjual / Admin utama sistem kasir',
@@ -36,8 +36,8 @@ class UserSeeder extends Seeder
         $pembeli = User::firstOrCreate(
             ['usr_id' => 2],
             [
-                'name' => 'Pembeli Contoh',
-                'email' => 'pembeli@kasir.com',
+                'name' => 'Sofia',
+                'email' => 'pembeli@mine.com',
                 'password' => Hash::make('12345'),
                 'usr_card_url' => 'assets/images/header/hero-image.jpg',
                 'usr_sys_note' => 'User pembeli standar',

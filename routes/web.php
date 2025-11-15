@@ -6,80 +6,68 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
-
-/*
-|--------------------------------------------------------------------------
-| 🌍 LANDING PAGE (PUBLIC)
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/', [ProductController::class, 'index'])->name('landing');
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\HomeController;
 
 
-/*
-|--------------------------------------------------------------------------
-| 🔒 AUTH ROUTES (GUEST ONLY)
-|--------------------------------------------------------------------------
-*/
+Route::get('/', [ProductController::class, 'index'])
+    ->name('landing');
+
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])
+        ->name('login');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->name('login.post');
 
-    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])
+        ->name('register');
+    Route::post('/register', [AuthController::class, 'register'])
+        ->name('register.post');
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| 👤 PROFILE + LOGOUT (SEMUA USER LOGIN)
-|--------------------------------------------------------------------------
-*/
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile');
+    Route::put('/profile/update', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-Route::middleware(['auth'])->group(function () {
-
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-
-    // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| 🛒 PEMBELI SAJA
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware(['auth', 'role:Pembeli'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])
+        ->name('cart');
+    Route::post('/cart/add', [CartController::class, 'add'])
+        ->name('cart.add');
 
-    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('/transactions', [TransactionController::class, 'index'])
+        ->name('transactions.index');
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])
+        ->name('transactions.show');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| 🛍️ PENJUAL / ADMIN SAJA
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware(['auth', 'role:Penjual'])->group(function () {
 
-    // Dashboard penjual/admin
-    Route::get('/dashboard', [AuthController::class, 'dashboard'])
-        ->name('dashboard');   // ← INI route dashboard YANG BENAR, BUKAN livewire.admin.dashboard
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])
+        ->name('dashboard');
 
-    // CRUD Produk
-    Route::get('/products/manage', [ProductController::class, 'manage'])->name('products.manage');
-    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-    Route::put('/products/{id}/update', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{id}/delete', [ProductController::class, 'delete'])->name('products.delete');
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::post('/store', [ProductController::class, 'store'])->name('store');
+        Route::put('/{id}/update', [ProductController::class, 'update'])->name('update');
+        Route::delete('/{id}/delete', [ProductController::class, 'delete'])->name('delete');
+    });
 
-    // Transaksi masuk
-    Route::get('/orders', [TransactionController::class, 'adminIndex'])->name('orders');
+    Route::get('/users', [AuthController::class, 'index'])
+        ->name('users.index');
+
+    Route::get('/orders', [TransactionController::class, 'adminIndex'])
+        ->name('orders');
+    Route::get('/orders/{id}', [TransactionController::class, 'adminShow'])
+        ->name('orders.show');
 });

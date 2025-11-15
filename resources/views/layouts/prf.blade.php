@@ -18,7 +18,8 @@
   <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
 </head>
-<body>
+<body style="height: 100%;
+    overflow: hidden;">
   @if (!Request::is('profile'))
   @endif
 

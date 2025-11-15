@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Traits\Blameable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,7 +21,7 @@ class User extends Authenticatable
 
     protected $blameablePrefix = 'usr_';
 
-   protected $dates = [
+    protected $dates = [
         'usr_created_at',
         'usr_updated_at',
         'usr_deleted_at',
@@ -44,15 +44,13 @@ class User extends Authenticatable
         ];
     }
 
-    public function login(): HasMany {
-        return $this->hasMany(User::class, 'usr_lg_user_id', 'usr_id');
-    }
-
+    // Relasi untuk transaksi
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'trx_user_id', 'usr_id');
     }
 
+    // Blameable
     public function created_by(): BelongsTo
     {
         return $this->belongsTo(User::class, 'usr_created_by', 'usr_id');

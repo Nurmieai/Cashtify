@@ -14,7 +14,7 @@ class ProductController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $products = Product::latest()->get();
+        $products = Product::latest()->paginate(10);
         return view('livewire.user.landing', compact('products'));
     }
 
