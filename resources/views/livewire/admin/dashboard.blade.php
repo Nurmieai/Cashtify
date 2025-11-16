@@ -1,62 +1,77 @@
-<x-layouts.main>
+<x-layouts.admin.main>
     <x-slot name="title">Dashboard Admin</x-slot>
 
     <div class="container py-4">
 
-        {{-- Statistik Ringkas --}}
+        {{-- ====== KARTU STATISTIK UTAMA ====== --}}
         <div class="row g-4 mb-4">
 
-            {{-- Total Produk --}}
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Total Produk</h6>
-                        <h3 class="fw-bold">{{ $productsCount }}</h3>
-                        <a href="{{ route('products.index') }}" class="btn btn-sm btn-outline-primary mt-2">Lihat</a>
+            <div class="col-md-4">
+                <div class="card border-0 text-white" style="background:#527edb;">
+                    <div class="card-body">
+                        <h2 class="fw-bold">{{ $buyersCount }}</h2>
+                        <p class="mb-0">Pengguna Aktif</p>
                     </div>
                 </div>
             </div>
 
-            {{-- Total Transaksi --}}
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Total Transaksi</h6>
-                        <h3 class="fw-bold">{{ $transactionsCount }}</h3>
-                        <a href="{{ route('orders') }}" class="btn btn-sm btn-outline-success mt-2">Lihat</a>
+            <div class="col-md-4">
+                <div class="card border-0 text-white" style="background:#f2b631;">
+                    <div class="card-body">
+                        <h2 class="fw-bold">{{ $productsCount }}</h2>
+                        <p class="mb-0">Total Produk</p>
                     </div>
                 </div>
             </div>
 
-            {{-- Total Pembeli --}}
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Total Pembeli</h6>
-                        <h3 class="fw-bold">{{ $buyersCount }}</h3>
-                        <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-info mt-2">Lihat</a>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Pemasukan Hari Ini --}}
-            <div class="col-md-3">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Pemasukan Hari Ini</h6>
-                        <h3 class="fw-bold">
-                            Rp {{ number_format($todayIncome, 0, ',', '.') }}
-                        </h3>
-                        <a href="{{ route('orders') }}" class="btn btn-sm btn-outline-dark mt-2">Detail</a>
+            <div class="col-md-4">
+                <div class="card border-0 text-white" style="background:#42c6b1;">
+                    <div class="card-body">
+                        <h2 class="fw-bold">{{ $transactionsCount }}</h2>
+                        <p class="mb-0">Total Transaksi</p>
                     </div>
                 </div>
             </div>
 
         </div>
 
+
+        {{-- ====== BAGIAN CHART ====== --}}
+        <div class="row mb-4">
+
+            {{-- BAR CHART PRODUK TERJUAL --}}
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold">Produk Terjual 30 Hari Terakhir</h5>
+                        <canvas id="productChart" height="140"></canvas>
+                    </div>
+
+                    <div class="p-3 bg-light">
+                        <p class="mb-1">Periode: 30 hari terakhir</p>
+                        <p class="mb-1">Total Produk Terjual: <strong>{{ array_sum($productStats) }}</strong></p>
+                        <p class="mb-0">Rata-rata / hari: <strong>{{ number_format(array_sum($productStats) / 30, 1) }}</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- DONUT CHART STATUS TRANSAKSI --}}
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-center">Status Transaksi</h5>
+                        <canvas id="statusChart" height="260"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        {{-- ====== TABEL TRANSAKSI ====== --}}
         <div class="card shadow-sm border-0 mb-5">
             <div class="card-body">
-                <h5 class="card-title mb-3">Transaksi Terbaru</h5>
+                <h5 class="card-title mb-3 fw-bold">Transaksi Terbaru</h5>
 
                 <table class="table table-striped table-bordered mb-0">
                     <thead class="table-light">
@@ -72,37 +87,29 @@
                     </thead>
 
                     <tbody>
-                        @forelse($latestTransactions as $index => $trx)
+                        @forelse($latestTransactions as $index => $tst)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
+                                <td>{{ $tst->tst_invoice }}</td>
+                                <td>{{ $tst->buyer->usr_name ?? 'Guest' }}</td>
+                                <td>Rp {{ number_format($tst->tst_total, 0, ',', '.') }}</td>
 
-                                {{-- invoice --}}
-                                <td>{{ $trx->tst_invoice }}</td>
-
-                                {{-- nama buyer --}}
-                                <td>{{ $trx->buyer->usr_name ?? 'Guest' }}</td>
-
-                                {{-- total --}}
-                                <td>Rp {{ number_format($trx->tst_total, 0, ',', '.') }}</td>
-
-                                {{-- status badge --}}
                                 <td>
                                     <span class="badge
-                                        @if($trx->tst_status == 'paid') bg-success
-                                        @elseif($trx->tst_status == 'pending') bg-warning
-                                        @else bg-danger
+                                        @if($tst->tst_status === 'paid') bg-success
+                                        @elseif($tst->tst_status === 'pending') bg-warning
+                                        @elseif($tst->tst_status === 'failed') bg-danger
+                                        @elseif($tst->tst_status === 'expired') bg-secondary
+                                        @elseif($tst->tst_status === 'cancelled') bg-dark
                                         @endif">
-                                        {{ ucfirst($trx->tst_status) }}
+                                        {{ ucfirst($tst->tst_status) }}
                                     </span>
                                 </td>
 
-                                {{-- tanggal --}}
-                                <td>{{ optional($trx->tst_created_at)->format('Y-m-d') }}</td>
+                                <td>{{ $tst->tst_created_at?->format('Y-m-d H:i') }}</td>
 
-                                {{-- detail --}}
                                 <td>
-                                    <a href="{{ route('orders.show', $trx->tst_id) }}"
-                                       class="btn btn-sm btn-primary">
+                                    <a href="{{ route('orders.show', $tst->tst_id) }}" class="btn btn-sm btn-primary">
                                         Detail
                                     </a>
                                 </td>
@@ -112,14 +119,14 @@
                                 <td colspan="7" class="text-center text-muted">Belum ada transaksi</td>
                             </tr>
                         @endforelse
-
                     </tbody>
-                </table>
 
+                </table>
             </div>
         </div>
 
     </div>
+
 
     <footer class="bg-white border-top py-3 mt-auto">
         <div class="container text-center">
@@ -127,4 +134,47 @@
         </div>
     </footer>
 
-</x-layouts.main>
+
+    {{-- ================= CHART.JS ================= --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // ================= BAR CHART PRODUK TERJUAL =================
+        new Chart(document.getElementById('productChart'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode(array_keys($productStats)) !!},
+                datasets: [{
+                    label: "Produk Terjual",
+                    data: {!! json_encode(array_values($productStats)) !!},
+                    backgroundColor: "#2d8be8"
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // ================= DONUT CHART TRANSAKSI =================
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ["Paid", "Pending", "Failed", "Expired", "Cancelled"],
+                datasets: [{
+                    data: [
+                        {{ $tstStatus['paid'] ?? 0 }},
+                        {{ $tstStatus['pending'] ?? 0 }},
+                        {{ $tstStatus['failed'] ?? 0 }},
+                        {{ $tstStatus['expired'] ?? 0 }},
+                        {{ $tstStatus['cancelled'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#4caf50', '#ffca28', '#f44336', '#9e9e9e', '#424242']
+                }]
+            },
+            options: {
+                cutout: '70%'
+            }
+        });
+    </script>
+
+</x-layouts.admin.main>

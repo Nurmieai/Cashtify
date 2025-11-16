@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Location;
-use App\Models\Post;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\User;
@@ -13,35 +11,52 @@ class HomeController extends Controller
 {
     public function dashboard()
     {
-         return view('livewire.admin.dashboard', [
-        'locationsCount' => Location::count(),
+        // ========== COUNT DATA ==========
+        $buyersCount = User::count();
+        $productsCount     = Product::count();
+        $transactionsCount = Transaction::count();
 
-        'postsCount' => Post::count(),
-        'latestPosts' => Post::with('createdBy')
-                             ->latest()
-                             ->take(2)
-                             ->get(),
 
-        'productsCount' => Product::count(),
+        // ========== PRODUK TERJUAL 30 HARI (BAR CHART) ==========
+        $productStats = [];
 
-        'buyersCount'  => User::role('Pembeli')->count(),
-        'sellersCount' => User::role('Penjual')->count(),
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i)->toDateString();
 
-        'transactionsCount' => Transaction::count(),
+            $count = Transaction::whereDate('tst_created_at', $date)
+                ->where('tst_status', 'paid')
+                ->sum('tst_total'); // tanpa transaction items → pakai total transaksi
 
-        'monthlyIncome' => Transaction::whereMonth('trx_created_at', Carbon::now()->month)
-                                      ->whereYear('trx_created_at', Carbon::now()->year)
-                                      ->where('trx_status', 'paid')
-                                      ->sum('trx_total'),
+            $productStats[$date] = (int) $count;
+        }
 
-        'todayIncome' => Transaction::whereDate('trx_created_at', now()->toDateString())
-                            ->where('trx_status', 'paid')
-                            ->sum('trx_total'),
 
-        'latestTransactions' => Transaction::with(['buyer', 'seller'])
-                                           ->latest()
-                                           ->take(5)
-                                           ->get(),
-    ]);
+        // ========== STATUS TRANSAKSI (DONUT CHART) ==========
+        $tstStatus = [
+            'paid'      => Transaction::where('tst_status', 'paid')->count(),
+            'pending'   => Transaction::where('tst_status', 'pending')->count(),
+            'failed'    => Transaction::where('tst_status', 'failed')->count(),
+            'expired'   => Transaction::where('tst_status', 'expired')->count(),
+            'cancelled' => Transaction::where('tst_status', 'cancelled')->count(),
+        ];
+
+
+        // ========== TRANSAKSI TERBARU ==========
+        $latestTransactions = Transaction::with(['buyer'])
+            ->orderBy('tst_created_at', 'desc')
+            ->take(5)
+            ->get();
+
+
+        // ========== FINAL SEND TO BLADE ==========
+        return view('livewire.admin.dashboard', [
+            'buyersCount'       => $buyersCount,
+            'productsCount'     => $productsCount,
+            'transactionsCount' => $transactionsCount,
+
+            'productStats'      => $productStats,
+            'tstStatus'         => $tstStatus,
+            'latestTransactions'=> $latestTransactions,
+        ]);
     }
 }

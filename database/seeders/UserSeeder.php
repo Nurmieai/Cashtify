@@ -11,40 +11,98 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $penjualRole = Role::firstOrCreate([
-            'name' => 'Penjual',
-        ]);
+        // ============================
+        //  ROLES
+        // ============================
+        $penjualRole = Role::firstOrCreate(['name' => 'Penjual']);
+        $pembeliRole = Role::firstOrCreate(['name' => 'Pembeli']);
 
-        $pembeliRole = Role::firstOrCreate([
-            'name' => 'Pembeli',
-        ]);
 
-        $penjual = User::firstOrCreate(
-            ['usr_id' => 1], // PK kamu custom
+        // ============================
+        //  ADMIN / PENJUAL UTAMA
+        // ============================
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@mine.com'],
             [
-                'name' => 'Penjual Utama',
-                'email' => 'admin@mine.com',
-                'password' => Hash::make('12345'),
-                'usr_card_url' => 'assets/images/header/hero-image.jpg',
-                'usr_sys_note' => 'Penjual / Admin utama sistem kasir',
-                'usr_created_at' => now(),
-                'usr_updated_at' => now(),
+                'name'          => 'Penjual Utama',
+                'password'      => Hash::make('12345'),
+                'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                'usr_sys_note'  => 'Penjual / Admin utama sistem kasir',
             ]
         );
-        $penjual->assignRole($penjualRole);
+        $admin->assignRole($penjualRole);
 
-        $pembeli = User::firstOrCreate(
-            ['usr_id' => 2],
+
+        // ============================
+        //  PEMBELI UTAMA
+        // ============================
+        $mainBuyer = User::firstOrCreate(
+            ['email' => 'pembeli@mine.com'],
             [
-                'name' => 'Sofia',
-                'email' => 'pembeli@mine.com',
-                'password' => Hash::make('12345'),
-                'usr_card_url' => 'assets/images/header/hero-image.jpg',
-                'usr_sys_note' => 'User pembeli standar',
-                'usr_created_at' => now(),
-                'usr_updated_at' => now(),
+                'name'          => 'Sofia',
+                'password'      => Hash::make('12345'),
+                'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                'usr_sys_note'  => 'User pembeli standar',
             ]
         );
-        $pembeli->assignRole($pembeliRole);
+        $mainBuyer->assignRole($pembeliRole);
+
+
+        // ============================
+        //  USER DUMMY MANUAL (TANPA LOOP)
+        // ============================
+
+        $dummyUsers = [
+            [
+                'email' => 'dummy1@mine.com',
+                'name'  => 'Dion Septian Kevin',
+            ],
+            [
+                'email' => 'dummy2@mine.com',
+                'name'  => 'Aiman Fairus',
+            ],
+            [
+                'email' => 'dummy3@mine.com',
+                'name'  => 'Amelia Putri Saparani',
+            ],
+            [
+                'email' => 'dummy4@mine.com',
+                'name'  => 'Andi Juliansyah',
+            ],
+            [
+                'email' => 'dummy5@mine.com',
+                'name'  => 'Abror Fadillah Ramadhan',
+            ],
+            [
+                'email' => 'dummy6@mine.com',
+                'name'  => 'Dian Hakim',
+            ],
+            [
+                'email' => 'dummy7@mine.com',
+                'name'  => 'Raditia Scorpio Djayakusumah',
+            ],
+            [
+                'email' => 'dummy8@mine.com',
+                'name'  => 'Reyzal',
+            ],
+            [
+                'email' => 'dummy9@mine.com',
+                'name'  => 'Savaira Malika Fitri Handini',
+            ],
+        ];
+
+        foreach ($dummyUsers as $data) {
+            $user = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name'          => $data['name'],
+                    'password'      => Hash::make('12345'),
+                    'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                    'usr_sys_note'  => 'Akun dummy untuk testing',
+                ]
+            );
+
+            $user->assignRole($pembeliRole);
+        }
     }
 }
