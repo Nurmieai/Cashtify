@@ -6,19 +6,25 @@
     <section class="py-4" id="Products" style="scroll-margin-top: 80px; margin-top: 130px;">
         <div class="container">
             <h4 class="fw-bold mb-4 text-center">> Produk Terpopuler <</h4>
-
-            {{-- Slider Produk Dummy --}}
             <div class="product-slider">
                 <div class="product-track d-flex">
-                    @for ($i = 1; $i <= 5; $i++)
-                        <div class="cards mx-3 border-0 shadow-sm product-card">
-                            <img src="{{ asset('assets/images/logo.svg') }}" class="card-img-top" alt="Produk {{ $i }}">
-                            <div class="card-body text-center">
-                                <h6 class="fw-semibold mb-1">Produk {{ $i }}</h6>
-                                <p class="text-primary fw-bold mb-0">Rp {{ number_format(10000 * $i, 0, ',', '.') }}</p>
+                    @forelse ($products as $product)
+                        <div class="cards mx-3 product-card">
+                            <img src="{{ $product->prd_card_url ? asset($product->prd_card_url) : asset('assets/images/logo.svg') }}"
+                                alt="{{ $product->prd_name }}"> 
+                                <div class="card-body text-center">
+                                    <h6 class="product-title">
+                                        {{ $product->prd_name }}
+                                    </h6>
+                                    <p class="product-price mb-0">
+                                        Rp {{ number_format($product->prd_price, 0, ',', '.') }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    @endfor
+                        @empty
+                            <p class="text-muted">Tidak ada produk tersedia.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
