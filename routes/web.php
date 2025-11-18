@@ -81,16 +81,25 @@ Route::middleware(['auth', 'role:Pembeli'])->group(function () {
 Route::middleware(['auth', 'role:Penjual'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [HomeController::class, 'dashboard'])
-        ->name('dashboard');
+        Route::get('/dashboard', [HomeController::class, 'dashboard'])
+            ->name('dashboard');
 
-    // Produk
-    Route::prefix('products')->name('products.')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [ProductController::class, 'adminIndex'])->name('index');
+        Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::post('/store', [ProductController::class, 'store'])->name('store');
+        Route::get('/{id}/show', [ProductController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{id}/update', [ProductController::class, 'update'])->name('update');
         Route::delete('/{id}/delete', [ProductController::class, 'delete'])->name('delete');
+
+        // Soft Deletes
+        Route::get('/trash', [ProductController::class, 'trashed'])->name('trashed');
+        Route::post('/{id}/restore', [ProductController::class, 'restore'])->name('restore');
+        Route::delete('/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('forceDelete');
+
     });
+
 
     // User Management
     Route::get('/users', [AuthController::class, 'index'])

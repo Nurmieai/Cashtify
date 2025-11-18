@@ -11,27 +11,31 @@ class HomeController extends Controller
 {
     public function dashboard()
     {
-        // ========== COUNT DATA ==========
-        $buyersCount = User::count();
-        $productsCount     = Product::count();
+        // --- Statistik Utama ---
+        $buyersCount = User::whereHas('roles', fn($q) => $q->where('name', 'Pembeli'))->count();
+
+        $productsCount = Product::count();
+
         $transactionsCount = Transaction::count();
 
+        // --- Produk terjual 30 hari terakhir (dummy: sesuaikan dengan tabelmu) ---
+        $startDate = Carbon::now()->subDays(30);
 
-        // ========== PRODUK TERJUAL 30 HARI (BAR CHART) ==========
+        $productStatsRaw = Transaction::where('tst_status', 'paid')
+            ->where('tst_created_at', '>=', $startDate)
+            ->selectRaw('DATE(tst_created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date')
+            ->toArray();
+
+        // Isi tanggal yang kosong
         $productStats = [];
-
-        for ($i = 29; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i)->toDateString();
-
-            $count = Transaction::whereDate('tst_created_at', $date)
-                ->where('tst_status', 'paid')
-                ->sum('tst_total'); // tanpa transaction items → pakai total transaksi
-
-            $productStats[$date] = (int) $count;
+        for ($i = 0; $i < 30; $i++) {
+            $date = Carbon::now()->subDays(29 - $i)->toDateString();
+            $productStats[$date] = $productStatsRaw[$date] ?? 0;
         }
 
-
-        // ========== STATUS TRANSAKSI (DONUT CHART) ==========
+        // --- Status Transaksi ---
         $tstStatus = [
             'paid'      => Transaction::where('tst_status', 'paid')->count(),
             'pending'   => Transaction::where('tst_status', 'pending')->count(),
@@ -40,23 +44,19 @@ class HomeController extends Controller
             'cancelled' => Transaction::where('tst_status', 'cancelled')->count(),
         ];
 
-
-        // ========== TRANSAKSI TERBARU ==========
-        $latestTransactions = Transaction::with(['buyer'])
-            ->orderBy('tst_created_at', 'desc')
-            ->take(5)
+        // --- Transaksi terbaru ---
+        $latestTransactions = Transaction::with('buyer')
+            ->latest()
+            ->take(10)
             ->get();
 
-
-        // ========== FINAL SEND TO BLADE ==========
-        return view('livewire.admin.dashboard', [
-            'buyersCount'       => $buyersCount,
-            'productsCount'     => $productsCount,
-            'transactionsCount' => $transactionsCount,
-
-            'productStats'      => $productStats,
-            'tstStatus'         => $tstStatus,
-            'latestTransactions'=> $latestTransactions,
-        ]);
+        return view('livewire.admin.dashboard', compact(
+            'buyersCount',
+            'productsCount',
+            'transactionsCount',
+            'productStats',
+            'tstStatus',
+            'latestTransactions'
+        ));
     }
 }

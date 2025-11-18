@@ -555,12 +555,44 @@ textarea {
   border-color: #9ca3af; /* pas hover jadi lebih gelap */
 }
 
+/* Hilangkan caret bawaan bootstrap */
+.btn-group .dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Pakai caret custom yang menghadap ke atas */
+.btn-group .dropdown-toggle {
+    background-image: none !important;
+    position: relative;
+    padding-right: 1.8rem; /* biar ada space untuk caret */
+}
+
+.btn-group .dropdown-toggle::before {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-40%);
+    border-left: .3em solid transparent;
+    border-right: .3em solid transparent;
+    border-bottom: .3em solid currentColor; /* caret menghadap ke atas */
+}
+
+
 .product-card {
   border: 1.5px solid #d1d5db; /* abu-abu sedang */
   border-radius: 12px;
   transition: all 0.2s ease-in-out;
   background: #fff;
+  position: relative;
+  overflow: visible !important;
+  z-index: 1;
 }
+
+.product-card .dropdown-menu {
+        position: absolute;
+        z-index: 9999 !important;
+    }
 
 .product-card:hover {
   transform: translateY(-5px);
@@ -826,6 +858,28 @@ textarea {
     box-shadow: none;
   }
 }
+    .sb-sidenav .nav-link {
+        color: #cfd3dc;
+        padding: 12px 20px;
+        transition: 0.2s ease;
+    }
+
+    .sb-sidenav .nav-link:hover {
+        background-color: rgba(255,255,255,0.06);
+        color: #fff;
+    }
+
+    /* ACTIVE STATE — mirip contoh yang kamu kirim */
+    .sb-sidenav .nav-link.active {
+        background-color: rgba(255,255,255,0.15) !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    .sb-sidenav .nav-link.active .sb-nav-link-icon i {
+        color: #ffc107 !important; /* highlight icon */
+    }
+
 .sticky {
   position: fixed !important;
   z-index:99 !important;
