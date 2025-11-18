@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
         //  PEMBELI UTAMA
         // ============================
         $mainBuyer = User::firstOrCreate(
-            ['email' => 'pembeli@mine.com'],
+            ['email' => 'sofia@mine.com'],
             [
                 'name'          => 'Sofia',
                 'password'      => Hash::make('12345'),

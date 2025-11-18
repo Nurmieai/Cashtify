@@ -21,18 +21,20 @@
           <!-- Navbar Menu -->
           <div class="collapse navbar-collapse sub-menu-bar" id="navbarNine">
             <ul class="navbar-nav mb-2 mb-lg-0">
-              <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="#blog">Features</a></li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
-                <ul class="dropdown-menu" aria-labelledby="menuDropdown">
-                  <li><a class="dropdown-item" href="#call-action">Transaksi</a></li>
-                  <li><a class="dropdown-item" href="#pricing">Produk</a></li>
-                  <li><a class="dropdown-item" href="#blog">Pencatatan</a></li>
-                </ul>
-              </li>
-              <li class="nav-item"><a class="nav-link" href="#clients">Maps</a></li>
+              <li class="nav-item"><a class="nav-link active" href="#">Produk</a></li>
+              <li class="nav-item"><a class="nav-link" href="#Customer-Service">Layanan Kami</a></li>
+              <li class="nav-item"><a class="nav-link" href="#footer">Tentang Kami</a></li>
+              @if (Auth::check() && Auth::user()->hasRole('Pembeli'))
+             <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
+               <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary" aria-labelledby="menuDropdown">
+                 <li><a class="dropdown-item" href="#Orders">Pesanan Saya</a></li>
+                 <li><a class="dropdown-item" href="#Carts">Keranjang Saya</a></li>
+                 <li><a class="dropdown-item" href="#Notification">Notifikasi</a></li>
+               </ul>
+             </li>
+             @endif
             </ul>
 
             <!-- Buttons -->
