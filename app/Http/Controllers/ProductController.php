@@ -8,41 +8,43 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-
     /* ============================================================
-     * USER — LANDING PAGE (List Produk untuk Pembeli)
+     * USER — LANDING PAGE
      * ============================================================ */
     public function index()
     {
+        // Jika Penjual login → lempar ke dashboard admin
+        if (auth()->check() && auth()->user()->hasRole('Penjual')) {
+            return redirect()->route('dashboard');
+        }
+
         $products = Product::where('prd_status', 'tersedia')
-            ->latest()
+            ->latest('usr_created_at')
             ->paginate(12);
 
         return view('livewire.user.landing', [
             'products' => $products,
-            'title' => 'Daftar Produk',
+            'title'    => 'Daftar Produk',
         ]);
     }
 
 
-
     /* ============================================================
-     * ADMIN — LIST PRODUK (Kelola Produk)
+     * ADMIN — LIST PRODUK
      * ============================================================ */
     public function adminIndex()
     {
-        $products = Product::latest()->paginate(12);
+        $products = Product::latest('usr_created_at')->paginate(12);
 
         return view('livewire.admin.products.index', [
             'products' => $products,
-            'title' => 'Kelola Produk',
+            'title'    => 'Kelola Produk',
         ]);
     }
 
 
-
     /* ============================================================
-     * FORM TAMBAH PRODUK (ADMIN)
+     * ADMIN — FORM TAMBAH PRODUK
      * ============================================================ */
     public function create()
     {
@@ -52,9 +54,8 @@ class ProductController extends Controller
     }
 
 
-
     /* ============================================================
-     * SIMPAN PRODUK BARU (ADMIN)
+     * ADMIN — SIMPAN PRODUK BARU
      * ============================================================ */
     public function store(Request $request)
     {
@@ -80,29 +81,27 @@ class ProductController extends Controller
         ]);
 
         return redirect()
-            ->route('products.index')
+            ->route('products.adminIndex')
             ->with('success', 'Produk berhasil ditambahkan.');
     }
 
 
-
     /* ============================================================
-     * DETAIL PRODUK (ADMIN)
+     * ADMIN — DETAIL
      * ============================================================ */
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::withTrashed()->findOrFail($id);
 
-        return view('livewire.admin.products.show', [
+        return view('livewire.admin.products.detail', [
             'product' => $product,
-            'title' => 'Detail Produk: ' . $product->prd_name,
+            'title'   => 'Detail Produk: ' . $product->prd_name,
         ]);
     }
 
 
-
     /* ============================================================
-     * FORM EDIT PRODUK (ADMIN)
+     * ADMIN — FORM EDIT
      * ============================================================ */
     public function edit($id)
     {
@@ -110,14 +109,13 @@ class ProductController extends Controller
 
         return view('livewire.admin.products.edit', [
             'product' => $product,
-            'title' => 'Edit Produk: ' . $product->prd_name,
+            'title'   => 'Edit Produk: ' . $product->prd_name,
         ]);
     }
 
 
-
     /* ============================================================
-     * UPDATE PRODUK (ADMIN)
+     * ADMIN — UPDATE PRODUK
      * ============================================================ */
     public function update(Request $request, $id)
     {
@@ -141,48 +139,57 @@ class ProductController extends Controller
             'prd_status'      => $request->prd_status,
             'prd_price'       => $request->prd_price,
             'prd_card_url'    => $imagePath,
+            'prd_updated_by'  => Auth::id(),
         ]);
 
         return redirect()
-            ->route('products.index')
+            ->route('products.adminIndex')
             ->with('success', 'Produk berhasil diperbarui.');
     }
 
 
-
     /* ============================================================
-     * SOFT DELETE — PINDAH KE TRASH
+     * ADMIN — SOFT DELETE
      * ============================================================ */
     public function delete($id)
     {
-        Product::findOrFail($id)->delete();
+        $product = Product::findOrFail($id);
+        $product->prd_deleted_by = auth()->id();
+        $product->save();
+
+        $product->delete();
 
         return back()->with('success', 'Produk berhasil dihapus.');
     }
 
 
-
     /* ============================================================
-     * LIST PRODUK TERHAPUS (ADMIN)
+     * ADMIN — TRASH LIST
      * ============================================================ */
     public function trashed()
     {
-        $products = Product::onlyTrashed()->latest()->paginate(12);
+        $products = Product::onlyTrashed()
+            ->latest('usr_deleted_at')
+            ->paginate(12);
 
         return view('livewire.admin.products.trash', [
             'products' => $products,
-            'title' => 'Produk Terhapus',
+            'title'    => 'Produk Terhapus',
         ]);
     }
 
 
-
     /* ============================================================
-     * RESTORE PRODUK (ADMIN)
+     * ADMIN — RESTORE
      * ============================================================ */
     public function restore($id)
     {
-        Product::onlyTrashed()->findOrFail($id)->restore();
+        $product = Product::onlyTrashed()->findOrFail($id);
+
+        $product->prd_deleted_by = null;
+        $product->save();
+
+        $product->restore();
 
         return redirect()
             ->route('products.trashed')
@@ -190,9 +197,8 @@ class ProductController extends Controller
     }
 
 
-
     /* ============================================================
-     * FORCE DELETE — HAPUS PERMANEN
+     * ADMIN — HAPUS PERMANEN
      * ============================================================ */
     public function forceDelete($id)
     {

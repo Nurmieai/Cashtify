@@ -19,15 +19,12 @@
   <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
 </head>
 <body class="d-flex flex-column min-vh-100">
-    {{-- Panggil navbar component --}}
     <x-layouts.navbar />
 
-    {{-- Konten halaman --}}
     <main class="flex-fill">
         {{ $slot }}
     </main>
-
-    {{-- Panggil footer component --}}
+    
     <x-layouts.footer />
 
   @stack('scripts')
