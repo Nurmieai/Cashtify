@@ -180,6 +180,7 @@
     --bs-form-valid-border-color: #75b798;
     --bs-form-invalid-color: #ea868f;
     --bs-form-invalid-border-color: #ea868f;
+    --font-family: "Inter", sans-serif;
 }
 *,
 ::after,
@@ -193,7 +194,7 @@
 }
 body {
     margin: 0;
-    font-family: var(--bs-body-font-family);
+    font-family: var(--font-family);
     font-size: var(--bs-body-font-size);
     font-weight: var(--bs-body-font-weight);
     line-height: var(--bs-body-line-height);

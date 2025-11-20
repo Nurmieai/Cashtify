@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="{{ asset('css/tiny-slider.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/form.css') }}" />
+  <link rel="stylesheet" href="{{ asset('/css/adminlte.min.css') }}">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <x-layouts.navbar />
@@ -24,7 +26,7 @@
     <main class="flex-fill">
         {{ $slot }}
     </main>
-    
+
     <x-layouts.footer />
 
   @stack('scripts')

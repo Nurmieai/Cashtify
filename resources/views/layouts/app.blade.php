@@ -10,7 +10,7 @@
   <!-- Favicon -->
   <link rel="shortcut icon" href="{{ asset('assets/images/1.svg') }}" type="image/svg+xml" />
   @vite(['resources/css/app.css'])
-  <!-- Bootstrap & Icons -->
+  <link rel="stylesheet" href="{{ asset('/css/adminlte.min.css') }}">
   <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" />
@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="{{ asset('css/tiny-slider.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}" />
   <link rel="stylesheet" href="{{ asset('css/landing.css') }}" />
+  <link rel="stylesheet" href="{{ asset('css/form.css') }}" />
 </head>
 
 <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
