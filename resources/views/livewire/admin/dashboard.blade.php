@@ -33,10 +33,7 @@
                 </div>
             </div>
 
-        </div>
-
-
-        {{-- ====== BAGIAN CHART ====== --}}
+        </div>\
         <div class="row mb-4">
 
             {{-- BAR CHART PRODUK TERJUAL --}}
@@ -55,7 +52,6 @@
                 </div>
             </div>
 
-            {{-- DONUT CHART STATUS TRANSAKSI --}}
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -133,13 +129,9 @@
             <small class="text-muted">&copy; 2025 Cashtify. All rights reserved.</small>
         </div>
     </footer>
-
-
-    {{-- ================= CHART.JS ================= --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // ================= BAR CHART PRODUK TERJUAL =================
         new Chart(document.getElementById('productChart'), {
             type: 'bar',
             data: {

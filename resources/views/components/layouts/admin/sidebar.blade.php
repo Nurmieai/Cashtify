@@ -10,7 +10,7 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('products.index') }}"
+                <a href="{{ route('products.adminIndex') }}"
                     class="nav-link {{ set_active('products.*') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                     Produk

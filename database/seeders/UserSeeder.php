@@ -11,16 +11,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // ============================
-        //  ROLES
-        // ============================
-        $penjualRole = Role::firstOrCreate(['name' => 'Penjual']);
-        $pembeliRole = Role::firstOrCreate(['name' => 'Pembeli']);
+        $penjualRole = Role::firstOrCreate(['name' => 'Penjual', 'guard_name' => 'web']);
+        $pembeliRole = Role::firstOrCreate(['name' => 'Pembeli', 'guard_name' => 'web']);
 
-
-        // ============================
-        //  ADMIN / PENJUAL UTAMA
-        // ============================
         $admin = User::firstOrCreate(
             ['email' => 'admin@mine.com'],
             [
@@ -32,10 +25,6 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole($penjualRole);
 
-
-        // ============================
-        //  PEMBELI UTAMA
-        // ============================
         $mainBuyer = User::firstOrCreate(
             ['email' => 'sofia@mine.com'],
             [
@@ -46,11 +35,6 @@ class UserSeeder extends Seeder
             ]
         );
         $mainBuyer->assignRole($pembeliRole);
-
-
-        // ============================
-        //  USER DUMMY MANUAL (TANPA LOOP)
-        // ============================
 
         $dummyUsers = [
             [

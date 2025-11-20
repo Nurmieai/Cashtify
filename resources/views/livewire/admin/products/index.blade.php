@@ -50,9 +50,8 @@
                                 @endif
                             </div>
 
-                            {{-- Bottom Buttons --}}
                              <div class="mt-auto text-center">
-                                <div class="ms-2 w-100 btn-group dropup">
+                                <div class="ms-auto w-100 btn-group dropup">
                                     <button
                                         type="button"
                                         class="btn btn-warning text-dark fw-semibold dropdown-toggle"
@@ -61,7 +60,7 @@
                                     >
                                         <i class="bi bi-stack"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-dark">
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                                         <li>
                                             <a class="dropdown-item"
                                             href="{{ route('products.show', $product->prd_id) }}">

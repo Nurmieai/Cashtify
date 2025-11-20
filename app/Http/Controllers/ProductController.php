@@ -8,12 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-    /* ============================================================
-     * USER — LANDING PAGE
-     * ============================================================ */
     public function index()
     {
-        // Jika Penjual login → lempar ke dashboard admin
         if (auth()->check() && auth()->user()->hasRole('Penjual')) {
             return redirect()->route('dashboard');
         }
@@ -28,13 +24,25 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /* ============================================================
-     * ADMIN — LIST PRODUK
-     * ============================================================ */
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        $products = Product::latest('usr_created_at')->paginate(12);
+        // Ambil keyword
+        $search = $request->input('search');
+
+        // Base query
+        $query = Product::query()->latest('usr_created_at');
+
+        // Kalau ada keyword, filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('prd_name', 'like', "%{$search}%")
+                ->orWhere('prd_description', 'like', "%{$search}%")
+                ->orWhere('prd_price', 'like', "%{$search}%");
+            });
+        }
+
+        // Eksekusi pagination
+        $products = $query->paginate(12)->withQueryString();
 
         return view('livewire.admin.products.index', [
             'products' => $products,
@@ -43,9 +51,6 @@ class ProductController extends Controller
     }
 
 
-    /* ============================================================
-     * ADMIN — FORM TAMBAH PRODUK
-     * ============================================================ */
     public function create()
     {
         return view('livewire.admin.products.create', [
@@ -53,10 +58,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /* ============================================================
-     * ADMIN — SIMPAN PRODUK BARU
-     * ============================================================ */
     public function store(Request $request)
     {
         $request->validate([
@@ -85,10 +86,6 @@ class ProductController extends Controller
             ->with('success', 'Produk berhasil ditambahkan.');
     }
 
-
-    /* ============================================================
-     * ADMIN — DETAIL
-     * ============================================================ */
     public function show($id)
     {
         $product = Product::withTrashed()->findOrFail($id);
@@ -99,10 +96,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /* ============================================================
-     * ADMIN — FORM EDIT
-     * ============================================================ */
     public function edit($id)
     {
         $product = Product::findOrFail($id);
@@ -113,10 +106,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /* ============================================================
-     * ADMIN — UPDATE PRODUK
-     * ============================================================ */
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -147,10 +136,6 @@ class ProductController extends Controller
             ->with('success', 'Produk berhasil diperbarui.');
     }
 
-
-    /* ============================================================
-     * ADMIN — SOFT DELETE
-     * ============================================================ */
     public function delete($id)
     {
         $product = Product::findOrFail($id);
@@ -162,10 +147,6 @@ class ProductController extends Controller
         return back()->with('success', 'Produk berhasil dihapus.');
     }
 
-
-    /* ============================================================
-     * ADMIN — TRASH LIST
-     * ============================================================ */
     public function trashed()
     {
         $products = Product::onlyTrashed()
@@ -178,17 +159,12 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /* ============================================================
-     * ADMIN — RESTORE
-     * ============================================================ */
     public function restore($id)
     {
         $product = Product::onlyTrashed()->findOrFail($id);
 
         $product->prd_deleted_by = null;
         $product->save();
-
         $product->restore();
 
         return redirect()
@@ -196,10 +172,6 @@ class ProductController extends Controller
             ->with('success', 'Produk berhasil direstore.');
     }
 
-
-    /* ============================================================
-     * ADMIN — HAPUS PERMANEN
-     * ============================================================ */
     public function forceDelete($id)
     {
         Product::onlyTrashed()->findOrFail($id)->forceDelete();

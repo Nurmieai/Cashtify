@@ -6,42 +6,49 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
-            $table->bigIncrements('crs_id');
-            $table->dateTime('crs_time');
-            $table->unsignedBigInteger('crs_user_id')->nullable();
-            $table->unsignedBigInteger('crs_product_id')->nullable();
+        Schema::create('cart_items', function (Blueprint $table) {
+            $table->bigIncrements('crs_item_id');
 
-            $table->unsignedBigInteger('crs_created_by')->unsigned()->nullable();
-            $table->unsignedBigInteger('crs_deleted_by')->unsigned()->nullable();
-            $table->unsignedBigInteger('crs_updated_by')->unsigned()->nullable();
+            $table->unsignedBigInteger('crs_item_cart_id');
+            $table->unsignedBigInteger('crs_item_product_id')->nullable();
+
+            $table->integer('crs_item_quantity')->default(1);
+            $table->bigInteger('crs_item_price')->default(0);
+            $table->bigInteger('crs_item_subtotal')->default(0);
+
+            // audit fields
+            $table->unsignedBigInteger('crs_item_created_by')->nullable();
+            $table->unsignedBigInteger('crs_item_updated_by')->nullable();
+            $table->unsignedBigInteger('crs_item_deleted_by')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
-            $table->string('crs_sys_note')->nullable();
+            $table->string('crs_item_sys_note')->nullable();
 
-            $table->foreign('crs_user_id')->references('usr_id')->on('users')->onDelete('cascade');
-            $table->foreign('crs_product_id')->references('prd_id')->on('products')->onDelete('cascade');
+            // Foreign keys
+            $table->foreign('crs_item_cart_id')
+                ->references('crs_id')->on('carts')
+                ->onDelete('cascade');
 
-            $table->foreign('crs_created_by')->references('usr_id')->on('users')->onDelete('cascade');
-            $table->foreign('crs_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
-            $table->foreign('crs_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_item_product_id')
+                ->references('prd_id')->on('products')
+                ->onDelete('set null');
 
-            $table->renameColumn('created_at', 'crs_created_at');
-            $table->renameColumn('updated_at', 'crs_updated_at');
-            $table->renameColumn('deleted_at', 'crs_deleted_at');
+            $table->foreign('crs_item_created_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_item_updated_by')->references('usr_id')->on('users')->onDelete('cascade');
+            $table->foreign('crs_item_deleted_by')->references('usr_id')->on('users')->onDelete('cascade');
+
+            // Rename timestamps
+            $table->renameColumn('created_at', 'crs_item_created_at');
+            $table->renameColumn('updated_at', 'crs_item_updated_at');
+            $table->renameColumn('deleted_at', 'crs_item_deleted_at');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('carts');
+        Schema::dropIfExists('cart_items');
     }
 };

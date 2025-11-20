@@ -32,7 +32,6 @@ class Transaction extends Model
         'tst_shipping_service',
         'tst_shipping_courier',
         'tst_tracking_code',
-        'tst_qr_reference',
         'tst_notes',
         'tst_created_by',
         'tst_updated_by',
@@ -48,5 +47,11 @@ class Transaction extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'tst_seller_id', 'usr_id');
+    }
+
+    // 💛 Relasi baru ke TransactionItem (WAJIB)
+    public function items()
+    {
+        return $this->hasMany(TransactionItem::class, 'tst_item_transaction_id', 'tst_id');
     }
 }

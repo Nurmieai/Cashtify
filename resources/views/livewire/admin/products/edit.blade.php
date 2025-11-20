@@ -44,8 +44,8 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Status</label>
                     <select name="prd_status" class="form-select">
-                        <option value="1" {{ $product->prd_status == 1 ? 'selected' : '' }}>Aktif</option>
-                        <option value="0" {{ $product->prd_status == 0 ? 'selected' : '' }}>Tidak Aktif</option>
+                        <option value="tersedia" {{ $product->prd_status == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="tidak tersedia" {{ $product->prd_status == 'tidak tersedia' ? 'selected' : '' }}>Tidak Tersedia</option>
                     </select>
                 </div>
 
@@ -62,6 +62,7 @@
                 {{-- Gambar sebelumnya --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold d-block">Foto Produk</label>
+
                     @if ($product->prd_card_url)
                         <img src="{{ asset($product->prd_card_url) }}" alt="product image"
                              class="img-fluid mb-2 rounded shadow" style="height:150px; object-fit:contain;">
@@ -72,14 +73,13 @@
 
                 {{-- Tombol --}}
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('products.index') }}" class="btn btn-secondary">Kembali</a>
+                    <a href="{{ route('products.adminIndex') }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
 
             </form>
         </div>
 
-        {{-- Informasi timestamp --}}
         <div class="card-footer small text-muted">
             Dibuat: {{ $product->usr_created_at ?? '-' }} |
             Diubah: {{ $product->usr_updated_at ?? '-' }} |

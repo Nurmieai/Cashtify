@@ -11,14 +11,10 @@ class Cart extends Model
 
     protected $table = 'carts';
     protected $primaryKey = 'crs_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     const CREATED_AT = 'crs_created_at';
     const UPDATED_AT = 'crs_updated_at';
     const DELETED_AT = 'crs_deleted_at';
-
-    protected $dates = ['crs_time'];
 
     protected $fillable = [
         'crs_time',
@@ -35,8 +31,19 @@ class Cart extends Model
         return $this->belongsTo(User::class, 'crs_user_id', 'usr_id');
     }
 
-    public function product()
+    public function items()
     {
-        return $this->belongsTo(Product::class, 'crs_product_id', 'prd_id');
+        return $this->hasMany(CartItem::class, 'crs_item_cart_id', 'crs_id');
     }
+
+    public function updateTotals()
+    {
+        $totalPrice = $this->items()->sum('crs_item_subtotal');
+        $totalItems = $this->items()->sum('crs_item_quantity');
+
+        $this->crs_total_price = $totalPrice;
+        $this->crs_total_items = $totalItems;
+        $this->save();
+    }
+
 }

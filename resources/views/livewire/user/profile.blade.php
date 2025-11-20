@@ -91,8 +91,16 @@
 
     <!-- Footer -->
     <div class="card-footer bg-light text-end text-secondary py-2 px-4">
-      Role: <strong>{{ $user->is_admin ? 'Admin' : 'Pembeli' }}</strong>
-    </div>
+        Role: <strong>
+            @if($user->hasRole('Penjual'))
+                Penjual
+            @elseif($user->hasRole('Pembeli'))
+                Pembeli
+            @else
+                Tidak Diketahui
+            @endif
+        </strong>
+    </div> 
   </div>
 </div>
 @endsection

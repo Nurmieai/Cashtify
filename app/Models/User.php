@@ -18,7 +18,7 @@ class User extends Authenticatable
 
     protected $primaryKey = 'usr_id';
     protected $guarded = ['usr_id'];
-
+    protected $guard_name = 'web';
     protected $blameablePrefix = 'usr_';
 
     protected $dates = [
