@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Shipments;
 
 class Transaction extends Model
 {
@@ -14,6 +15,7 @@ class Transaction extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
+    // Custom timestamps
     const CREATED_AT = 'tst_created_at';
     const UPDATED_AT = 'tst_updated_at';
     const DELETED_AT = 'tst_deleted_at';
@@ -39,6 +41,9 @@ class Transaction extends Model
         'tst_sys_note',
     ];
 
+    // ----------------- RELATIONSHIPS -----------------
+
+    // Buyer dan Seller
     public function buyer()
     {
         return $this->belongsTo(User::class, 'tst_buyer_id', 'usr_id');
@@ -49,9 +54,31 @@ class Transaction extends Model
         return $this->belongsTo(User::class, 'tst_seller_id', 'usr_id');
     }
 
-    // 💛 Relasi baru ke TransactionItem (WAJIB)
+    // Transaction Items
     public function items()
     {
         return $this->hasMany(TransactionItem::class, 'tst_item_transaction_id', 'tst_id');
+    }
+
+    // Shipment terkait
+    public function shipments()
+    {
+        return $this->hasOne(Shipments::class, 'shp_transaction_id', 'tst_id');
+    }
+
+    // Audit relationships
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'tst_created_by', 'usr_id');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'tst_updated_by', 'usr_id');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'tst_deleted_by', 'usr_id');
     }
 }

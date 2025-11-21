@@ -31,7 +31,7 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
     Route::prefix('transactions')->name('transactions.')->group(function () {
-        Route::get('/', [TransactionController::class, 'index'])->name('index');
+        Route::get('/', [TransactionController::class, 'adminIndex'])->name('index');
         Route::get('/create', [TransactionController::class, 'create'])->name('create');
         Route::post('/store', [TransactionController::class, 'store'])->name('store');
         Route::get('/{id}', [TransactionController::class, 'show'])->name('show');

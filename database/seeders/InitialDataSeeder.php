@@ -58,29 +58,6 @@ class InitialDataSeeder extends Seeder
         // ===== PANGGIL PRODUCT SEEDER DI SINI =====
         $this->call(ProductSeeder::class);
 
-        // ===== CART DEMO =====
-        DB::table('carts')->insert([
-            'crs_time' => now(),
-            'crs_user_id' => $pembeliId,
-            'crs_product_id' => 1,
-            'crs_created_by' => $pembeliId,
-            'crs_updated_by' => $pembeliId,
-            'crs_sys_note' => 'Demo cart',
-            'crs_created_at' => now(),
-            'crs_updated_at' => now(),
-        ]);
-
-        DB::table('carts')->insert([
-            'crs_time' => now(),
-            'crs_user_id' => $pembeliId,
-            'crs_product_id' => 2,
-            'crs_created_by' => $pembeliId,
-            'crs_updated_by' => $pembeliId,
-            'crs_sys_note' => 'Demo cart',
-            'crs_created_at' => now(),
-            'crs_updated_at' => now(),
-        ]);
-
         // ===== TRANSAKSI DEMO =====
         $subtotal = 50000 + 15000;
         $invoice = 'INV-' . date('Ymd') . '-' . Str::upper(Str::random(6));
