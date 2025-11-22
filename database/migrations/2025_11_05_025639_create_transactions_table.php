@@ -18,7 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('tst_seller_id')->unsigned();
             $table->integer('tst_total');
             $table->integer('tst_subtotal');
-            $table->integer('tst_discount')->default(0);
+            $table->string('tst_payment_method')->nullable();
+            $table->string('tst_payment_status')->default('pending');
+            $table->double('tst_payment_amount')->default(0);
+            $table->timestamp('tst_payment_paid_at')->nullable();
             $table->integer('tst_shipping_cost')->default(0);
             $table->string('tst_payment_method');
             $table->enum('tst_payment_status', ['1','2','3','4'])->default('1');

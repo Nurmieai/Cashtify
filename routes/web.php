@@ -38,6 +38,28 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
     });
 });
 
+Route::middleware(['auth', 'role:Pembeli'])->group(function () {
+    // Checkout Produk
+    Route::get('/checkout/product/{id}',
+        [TransactionController::class, 'productCheckout']
+    )->name('checkout.product');
+
+    Route::post('/checkout/product/{id}/store',
+        [TransactionController::class, 'productStore']
+    )->name('checkout.product.store');
+
+    // Invoice
+    Route::get('/checkout/invoice/{id}',
+        [TransactionController::class, 'productInvoice']
+    )->name('checkout.product.invoice');
+
+    Route::get('/checkout/pay/{id}',
+        [TransactionController::class, 'payNow']
+    )->name('checkout.product.pay');
+});
+
+
+
 Route::middleware(['auth', 'role:Penjual'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Shipment extends Model
+class Shipments extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -32,6 +32,7 @@ class Shipment extends Model
     // Custom timestamps
     const CREATED_AT = 'shp_created_at';
     const UPDATED_AT = 'shp_updated_at';
+    const DELETED_AT = 'shp_deleted_at';
     protected $dates = ['shp_deleted_at', 'shp_sent_at', 'shp_delivered_at'];
 
     // ----------------- RELATIONSHIPS -----------------

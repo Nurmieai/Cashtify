@@ -25,10 +25,10 @@
               <li class="nav-item"><a class="nav-link" href="#Customer-Service">Layanan Kami</a></li>
               <li class="nav-item"><a class="nav-link" href="#footer">Tentang Kami</a></li>
               @if (Auth::check() && Auth::user()->hasRole('Pembeli'))
-             <li class="nav-item dropdown">
+             <li class="nav-item dropdown ">
                <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
                   data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
-               <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary    " aria-labelledby="menuDropdown">
+               <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary" aria-labelledby="menuDropdown">
                  <li><a class="dropdown-item" href="#Orders">Pesanan Saya</a></li>
                  <li><a class="dropdown-item" href="#Carts">Keranjang Saya</a></li>
                  <li><a class="dropdown-item" href="#Notification">Notifikasi</a></li>

@@ -695,7 +695,155 @@ textarea {
   height: 48px;
   width: auto;
   object-fit: contain;
-  transform: scale(2.75);
+  transform: scale(2.75);/* === NAVBAR CORE === */
+.navbar-area.navbar-nine .navbar {
+  padding: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+/* spacing antar menu (desktop) */
+.navbar-area.navbar-nine .navbar-nav {
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-area.navbar-nine .navbar-nav .nav-item {
+  margin-left: 14px;
+}
+
+/* link menu (di navbar) */
+.navbar-area.navbar-nine .navbar-nav .nav-item .nav-link,
+.navbar-area.navbar-nine .navbar-nav .nav-item .page-scroll {
+  color: var(--white);
+  opacity: 0.95;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+/* === HOVER MENU UTAMA (underline indicator) === */
+.navbar-area.navbar-nine .navbar-nav .nav-link {
+  position: relative;
+}
+
+.navbar-area.navbar-nine .navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0%;
+  height: 2px;
+  background: #fff;
+  transition: width 0.25s ease;
+  border-radius: 10px;
+}
+
+.navbar-area.navbar-nine .navbar-nav .nav-link:hover::after,
+.navbar-area.navbar-nine .navbar-nav .nav-item.active .nav-link::after {
+  width: 100%;
+}
+
+/* === USER DROPDOWN BUTTON HOVER === */
+.navbar-area.navbar-nine #userDropdown {
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+.navbar-area.navbar-nine #userDropdown:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+.navbar-area.navbar-nine .show > #userDropdown {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* === DROPDOWN MENU === */
+.navbar-area.navbar-nine .dropdown-menu {
+  border-radius: 10px;
+  overflow: hidden;
+  border: none;
+  padding: 6px 0;
+  animation: dropdownFade 0.25s ease;
+  background-color: #fff; /* dropdown putih */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* dropdown item */
+.navbar-area.navbar-nine .dropdown-item {
+  color: var(--cashtify-primary);
+  padding: 10px 18px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: transparent;
+  position: relative;
+}
+
+/* efek hover */
+.navbar-area.navbar-nine .dropdown-item:hover {
+  background-color: #fff;
+  color: var(--cashtify-primary);
+  padding-left: 24px;
+}
+
+/* garis kiri */
+.navbar-area.navbar-nine .dropdown-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background-color: var(--cashtify-primary);
+  transition: width 0.3s ease;
+}
+
+.navbar-area.navbar-nine .dropdown-item:hover::before {
+  width: 5px;
+}
+
+/* animasi */
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === SEARCH INPUT === */
+.navbar-area.navbar-nine .form-control {
+  border: none;
+  outline: none;
+  padding: 6px 12px;
+  min-width: 200px;
+  background: rgba(255,255,255,0.12);
+  color: var(--white);
+}
+
+.navbar-area.navbar-nine .form-control::placeholder {
+  color: rgba(255,255,255,0.85);
+}
+
+/* === BUTTONS === */
+.navbar-area.navbar-nine .btn-outline-light {
+  border-color: rgba(255,255,255,0.18);
+}
+
+.navbar-area.navbar-nine .btn-light {
+  background: #fff;
+  color: var(--cashtify-primary);
+}
+
   transform-origin: left center;
   position: relative;
   top: 0;
@@ -728,6 +876,10 @@ textarea {
   padding: 8px 10px;
   border-radius: 6px;
   font-weight: 500;
+}
+
+.navbar-area.navbar-nine .dropdown-item{
+    color: var(--cashtify-primary) !important; /* merah saat hover */
 }
 
 /* hover & active */
@@ -766,7 +918,7 @@ textarea {
   overflow: hidden;
   border: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  background-color: var(--cashtify-primary); /* Merah Cashtify */
+  background-color: #fff;/* Merah Cashtify */
   padding: 6px 0;
   animation: dropdownFade 0.25s ease;
 }

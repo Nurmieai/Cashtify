@@ -120,66 +120,25 @@
                                                     <span class="badge bg-danger rounded-pill px-3 py-2 mb-3">Tidak Tersedia</span>
                                                 @endif
 
+                                                @if (Auth::check() && Auth::user()->hasRole('Pembeli'))
                                                 <div class="d-flex gap-3 mt-3">
                                                     <button class="btn btn-outline-danger w-50 py-2 rounded-3 fw-semibold">
                                                         🛒 Tambah
                                                     </button>
 
-                                                    <button class="btn btn-danger w-50 py-2 rounded-3 fw-semibold"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#checkoutModal{{ $product->prd_id }}">
+                                                    <a href="{{ route('checkout.product', $product->prd_id) }}"
+                                                    class="btn btn-danger w-50 py-2 rounded-3 fw-semibold">
                                                         ⚡ Beli
-                                                    </button>
+                                                    </a>
                                                 </div>
-
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
-
-                        <!-- MODAL CHECKOUT -->
-                        <div class="modal fade" id="checkoutModal{{ $product->prd_id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content border-0 shadow-lg rounded-4">
-
-                                    <div class="modal-header text-white py-3"
-                                         style="background-color: #c82333;">
-                                        <h5 class="modal-title fw-semibold">Checkout</h5>
-                                        <button type="button" class="btn-close btn-close-white"
-                                                data-bs-dismiss="modal"></button>
-                                    </div>
-
-                                    <div class="modal-body p-4">
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <span class="fw-semibold">Produk:</span>
-                                            <span>{{ $product->prd_name }}</span>
-                                        </div>
-
-                                        <div class="d-flex justify-content-between mb-3">
-                                            <span class="fw-semibold">Harga:</span>
-                                            <span>Rp {{ number_format($product->prd_price, 0, ',', '.') }}</span>
-                                        </div>
-
-                                        <label class="fw-semibold mb-2">Jumlah:</label>
-                                        <input type="number"
-                                               min="1"
-                                               class="form-control rounded-3 mb-4"
-                                               placeholder="Masukkan jumlah">
-
-                                        <button class="btn btn-danger w-100 py-2 rounded-3 fw-semibold">
-                                            Konfirmasi Pembelian
-                                        </button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
                     @endforeach
-
                 </div>
             @else
                 <p class="text-center text-muted">Belum ada produk.</p>
@@ -187,7 +146,7 @@
 
         </div>
     </section>
-        <section id="Customer-Service" class="py-5 bg-light" style="margin-top: 120px; scroll-margin-top: 200px;">
+        <section id="Customer-Service" class="py-5 bg-light" style="margin-top: 120px; scroll-margin-top: 240px;">
             <div class="container">
             <h4 class="fw-bold text-center mb-4 text-danger">Layanan Kami</h4>
             <div class="row g-4 justify-content-center">

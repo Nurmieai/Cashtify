@@ -1,19 +1,18 @@
 <x-layouts.admin.main>
     <x-slot:title>
-        {{ $title ?? 'Judul Default' }}
+        {{ $title ?? 'Daftar Transaksi' }}
     </x-slot:title>
-    <div class="container-fluid py-4">
 
+    <div class="container-fluid py-4">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body">
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold mb-0">📦 Daftar Transaksi</h4>
 
-                    {{-- Nanti bisa dipakai buat filter jika perlu --}}
-                    <form action="" method="GET" class="d-flex gap-2">
+                    <form action="{{ url()->current() }}" method="GET" class="d-flex gap-2">
                         <input type="text" class="form-control form-control-sm"
-                            name="search" placeholder="Cari kode transaksi...">
+                               name="search" placeholder="Cari kode transaksi...">
                         <button class="btn btn-sm btn-dark">Cari</button>
                     </form>
                 </div>
@@ -39,35 +38,34 @@
                                     <td>{{ $loop->iteration }}</td>
 
                                     <td class="fw-semibold">
-                                        {{ $trx->trx_code }}
+                                        {{ $trx->tst_invoice }}
                                     </td>
 
-                                    <td>{{ $trx->buyer->name ?? '-' }}</td>
+                                    <td>{{ $trx->buyer->usr_name ?? '-' }}</td>
 
-                                    <td>{{ $trx->trx_total_items }}</td>
+                                    <td>{{ $trx->items->count() }}</td>
 
-                                    <td>Rp{{ number_format($trx->trx_total_price, 0, ',', '.') }}</td>
+                                    <td>Rp{{ number_format($trx->tst_total, 0, ',', '.') }}</td>
 
                                     <td>
-                                        @if ($trx->trx_status === 'pending')
+                                        @if ($trx->tst_status === 'pending')
                                             <span class="badge bg-warning">Pending</span>
-                                        @elseif ($trx->trx_status === 'success')
+                                        @elseif ($trx->tst_status === 'success')
                                             <span class="badge bg-success">Sukses</span>
-                                        @elseif ($trx->trx_status === 'failed')
+                                        @elseif ($trx->tst_status === 'failed')
                                             <span class="badge bg-danger">Gagal</span>
                                         @endif
                                     </td>
 
-                                    <td>{{ $trx->trx_created_at }}</td>
+                                    <td>{{ $trx->tst_created_at }}</td>
 
                                     <td>
-                                        <a href="{{ route('admin.transactions.show', $trx->trx_id) }}"
-                                        class="btn btn-sm btn-primary">
+                                        <a href="{{ route('orders.show', $trx->tst_id) }}"
+                                           class="btn btn-sm btn-primary">
                                             Detail
                                         </a>
                                     </td>
                                 </tr>
-
                             @empty
                                 <tr>
                                     <td colspan="8" class="text-muted py-4">
