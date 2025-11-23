@@ -59,26 +59,51 @@ class InitialDataSeeder extends Seeder
         $this->call(ProductSeeder::class);
 
         // ===== TRANSAKSI DEMO =====
-        $subtotal = 50000 + 15000;
-        $invoice = 'INV-' . date('Ymd') . '-' . Str::upper(Str::random(6));
+        $buyers = [];
 
-        DB::table('transactions')->insert([
-            'tst_invoice' => $invoice,
-            'tst_buyer_id' => $pembeliId,
-            'tst_seller_id' => $penjualId,
-            'tst_total' => $subtotal,
-            'tst_subtotal' => $subtotal,
-            'tst_discount' => 0,
-            'tst_shipping_cost' => 0,
-            'tst_payment_method' => 'midtrans_qr',
-            'tst_payment_status' => '1',
-            'tst_status' => '1',
-            'tst_notes' => 'Transaksi demo',
-            'tst_created_by' => $penjualId,
-            'tst_updated_by' => $penjualId,
-            'tst_created_at' => now(),
-            'tst_updated_at' => now(),
-        ]);
+        for ($i = 1; $i <= 5; $i++) {
+            $user = User::firstOrCreate(
+                ['email' => "buyer$i@demo.com"],
+                [
+                    'name' => "Pembeli $i",
+                    'password' => Hash::make('12345'),
+                    'usr_card_url' => 'assets/images/header/hero-image.jpg',
+                    'usr_sys_note' => 'Pembeli dummy (Seeder)',
+                    'usr_created_at' => now(),
+                    'usr_updated_at' => now(),
+                ]
+            );
+            $user->assignRole($pembeliRole);
+            $buyers[] = $user->usr_id;
+        }
+
+        $paymentMethods = ['dana', 'bank_transfer'];
+
+        for ($i = 1; $i <= 15; $i++) {
+            $buyerId = $buyers[array_rand($buyers)];
+            $payment = $paymentMethods[array_rand($paymentMethods)];
+
+            $subtotal = rand(20000, 200000);
+            $invoice = 'RRQ-' . date('Ymd') . '-' . Str::upper(Str::random(6));
+
+            DB::table('transactions')->insert([
+                'tst_invoice' => $invoice,
+                'tst_buyer_id' => $buyerId,
+                'tst_seller_id' => $penjualId,
+                'tst_total' => $subtotal,
+                'tst_subtotal' => $subtotal,
+                'tst_shipping_cost' => 0,
+                'tst_payment_method' => $payment,
+                'tst_payment_status' => '1',    // WAJIB STR, bukan int
+                'tst_status' => '1',            // WAJIB STR
+                'tst_notes' => "Dummy transaksi ke-$i",
+                'tst_created_by' => $penjualId,
+                'tst_updated_by' => $penjualId,
+                'tst_created_at' => now()->subDays(rand(1, 60)),
+                'tst_updated_at' => now()->subDays(rand(1, 30)),
+            ]);
+        }
+
 
         // ===== ACCOUNTING DEMO =====
         DB::table('accountings')->insert([

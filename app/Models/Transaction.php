@@ -82,30 +82,30 @@ class Transaction extends Model
         ]);
     }
 
-    public function markPaymentSuccess($updatedBy = null)
+    public function markPaymentSuccess($adminId)
     {
         $this->update([
-            'tst_payment_status' => 'success',
+            'tst_payment_amount' => $this->tst_total,
             'tst_payment_paid_at' => now(),
-            'tst_status' => '2', // diproses
-            'tst_updated_by' => $updatedBy,
+            'tst_payment_status' => 2, // paid
+            'tst_status'          => 2, // transaksi dibayar
+            'tst_updated_by'      => $adminId
         ]);
     }
 
-    public function markPaymentFailed($updatedBy = null)
+    public function markPaymentCancelled($adminId)
     {
         $this->update([
-            'tst_payment_status' => 'failed',
-            'tst_updated_by' => $updatedBy,
+            'tst_payment_status' => 3, // failed
+            'tst_status'         => 6, // dibatalkan
+            'tst_updated_by'     => $adminId
         ]);
     }
 
-    public function markPaymentCancelled($updatedBy = null)
+    public function canBeConfirmed()
     {
-        $this->update([
-            'tst_payment_status' => 'cancelled',
-            'tst_updated_by' => $updatedBy,
-        ]);
+        // hanya bisa dikonfirmasi bila buyer sudah bayar
+        return (int)$this->tst_payment_status === 2;
     }
 
     // =============== AUDIT USER ===============

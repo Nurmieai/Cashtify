@@ -39,26 +39,54 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Pembeli'])->group(function () {
-    // Checkout Produk
-    Route::get('/checkout/product/{id}',
+
+    // Halaman checkout 1 produk
+    Route::get('/checkout/{id}',
         [TransactionController::class, 'productCheckout']
     )->name('checkout.product');
 
-    Route::post('/checkout/product/{id}/store',
+    // Proses checkout 1 produk
+    Route::post('/checkout/{id}',
         [TransactionController::class, 'productStore']
     )->name('checkout.product.store');
 
-    // Invoice
-    Route::get('/checkout/invoice/{id}',
+    // Halaman invoice
+    Route::get('/invoice/{id}',
         [TransactionController::class, 'productInvoice']
     )->name('checkout.product.invoice');
 
-    Route::get('/checkout/pay/{id}',
+    // Bayar sekarang
+    Route::get('/checkout/{id}/pay',
         [TransactionController::class, 'payNow']
     )->name('checkout.product.pay');
 });
 
+Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () {
 
+    Route::get('/transactions',
+        [TransactionController::class, 'adminIndex']
+    )->name('admin.transactions.index');
+
+    Route::get('/transactions/{id}',
+        [TransactionController::class, 'adminShow']
+    )->name('admin.transactions.show');
+
+    Route::post('/transactions/{id}/confirm-payment',
+        [TransactionController::class, 'adminConfirmPayment']
+    )->name('admin.transactions.confirm');
+
+    Route::post('/transactions/{id}/cancel',
+        [TransactionController::class, 'adminCancelTransaction']
+    )->name('admin.transactions.cancel');
+
+    Route::post('/transactions/{id}/ship',
+        [TransactionController::class, 'adminShipOrder']
+    )->name('admin.transactions.ship');
+
+    Route::post('/transactions/{id}/finish',
+        [TransactionController::class, 'adminFinishOrder']
+    )->name('admin.transactions.finish');
+});
 
 Route::middleware(['auth', 'role:Penjual'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');

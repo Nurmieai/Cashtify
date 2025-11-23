@@ -1,83 +1,134 @@
 <x-layouts.admin.main>
-    <x-slot:title>
-        {{ $title ?? 'Daftar Transaksi' }}
-    </x-slot:title>
+    <style>
+    /* Hilangkan scroll horizontal global */
+    .card-body,
+    .table-responsive {
+        overflow: visible !important;
+        white-space: normal !important;
+    }
 
-    <div class="container-fluid py-4">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body">
+    /* Bikin tabel dan card tidak memaksa overflow */
+    table {
+        width: 100% !important;
+    }
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="fw-bold mb-0">📦 Daftar Transaksi</h4>
+    img, .card-img-top {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+</style>
 
-                    <form action="{{ url()->current() }}" method="GET" class="d-flex gap-2">
-                        <input type="text" class="form-control form-control-sm"
-                               name="search" placeholder="Cari kode transaksi...">
-                        <button class="btn btn-sm btn-dark">Cari</button>
-                    </form>
-                </div>
+    <x-table_data :paginator="$transactions" title="Kelola Transaksi">
+        <x-slot:header>
+            <th>#</th>
+            <th>Invoice</th>
+            <th>Pembeli</th>
+            <th>Total Item</th>
+            <th>Total Harga</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+            <th></th>
+        </x-slot:header>
 
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th>#</th>
-                                <th>Kode</th>
-                                <th>Pembeli</th>
-                                <th>Total Item</th>
-                                <th>Total Harga</th>
-                                <th>Status</th>
-                                <th>Tanggal</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
+        @forelse ($transactions as $trx)
+            <tr class="text-center">
+                <td>{{ $loop->iteration }}</td>
+                <td class="fw-semibold">{{ $trx->tst_invoice }}</td>
+                <td>{{ $trx->buyer->usr_name ?? '-' }}</td>
+                <td>{{ $trx->items->count() }}</td>
+                <td>Rp{{ number_format($trx->tst_total, 0, ',', '.') }}</td>
 
-                        <tbody class="text-center">
-                            @forelse ($transactions as $trx)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                {{-- Status --}}
+                @php
+                    $st = [
+                        1 => ['Pending', 'warning'],
+                        2 => ['Dibayar', 'success'],
+                        3 => ['Dikemas', 'primary'],
+                        4 => ['Dikirim', 'info'],
+                        5 => ['Selesai', 'success'],
+                        6 => ['Dibatalkan', 'danger'],
+                        7 => ['Refund', 'secondary'],
+                    ];
+                @endphp
 
-                                    <td class="fw-semibold">
-                                        {{ $trx->tst_invoice }}
-                                    </td>
+                <td>
+                    <span class="badge bg-{{ $st[$trx->tst_status][1] }}">
+                        {{ $st[$trx->tst_status][0] }}
+                    </span>
+                </td>
 
-                                    <td>{{ $trx->buyer->usr_name ?? '-' }}</td>
+                <td>{{ $trx->tst_created_at }}</td>
 
-                                    <td>{{ $trx->items->count() }}</td>
+                <td>
+                    <div class="dropdown dropstart">
+                        <button class="btn btn-warning btn-sm dropdown-toggle"
+                            type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-menu-down"></i>
+                        </button>
 
-                                    <td>Rp{{ number_format($trx->tst_total, 0, ',', '.') }}</td>
+                        <ul class="dropdown-menu">
 
-                                    <td>
-                                        @if ($trx->tst_status === 'pending')
-                                            <span class="badge bg-warning">Pending</span>
-                                        @elseif ($trx->tst_status === 'success')
-                                            <span class="badge bg-success">Sukses</span>
-                                        @elseif ($trx->tst_status === 'failed')
-                                            <span class="badge bg-danger">Gagal</span>
-                                        @endif
-                                    </td>
+                            {{-- Detail --}}
+                            <li>
+                                <a class="dropdown-item"
+                                href="{{ route('admin.transactions.show', $trx->tst_id) }}">
+                                Detail
+                                </a>
+                            </li>
 
-                                    <td>{{ $trx->tst_created_at }}</td>
+                            {{-- Konfirmasi Pembayaran --}}
+                            @if ($trx->tst_payment_status == 1)
+                                <li>
+                                    <form action="{{ route('admin.transactions.confirm', $trx->tst_id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <button class="dropdown-item">Konfirmasi Pembayaran</button>
+                                    </form>
+                                </li>
+                            @endif
 
-                                    <td>
-                                        <a href="{{ route('orders.show', $trx->tst_id) }}"
-                                           class="btn btn-sm btn-primary">
-                                            Detail
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-muted py-4">
-                                        Belum ada transaksi...
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                            {{-- Kirim --}}
+                            @if ($trx->tst_status == 3)
+                                <li>
+                                    <form action="{{ route('admin.transactions.ship', $trx->tst_id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <button class="dropdown-item">Kirim Pesanan</button>
+                                    </form>
+                                </li>
+                            @endif
 
-            </div>
-        </div>
-    </div>
+                            {{-- Selesai --}}
+                            @if ($trx->tst_status == 4)
+                                <li>
+                                    <form action="{{ route('admin.transactions.finish', $trx->tst_id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <button class="dropdown-item">Tandai Selesai</button>
+                                    </form>
+                                </li>
+                            @endif
+
+                            {{-- Batalkan --}}
+                            @if ($trx->tst_status <= 3)
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('admin.transactions.cancel', $trx->tst_id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <button class="dropdown-item text-danger">
+                                            Batalkan Transaksi
+                                        </button>
+                                    </form>
+                                </li>
+                            @endif
+
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr><td colspan="8" class="py-4 text-muted">Belum ada transaksi.</td></tr>
+        @endforelse
+    </x-table_data>
 </x-layouts.admin.main>

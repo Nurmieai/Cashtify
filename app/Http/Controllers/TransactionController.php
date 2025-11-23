@@ -77,24 +77,20 @@ class TransactionController extends Controller
 
         // Buat transaksi
         $transaction = Transaction::create([
-            'tst_invoice'        => 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
+            'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'tst_buyer_id'       => Auth::user()->usr_id,
             'tst_seller_id'      => $product->prd_created_by,
             'tst_subtotal'       => $subtotal,
             'tst_total'          => $subtotal,
-            'tst_discount'       => 0,
             'tst_shipping_cost'  => 0,
-
-            // Payment in transaction table
             'tst_payment_method' => $request->payment_method,
-            'tst_payment_status' => 1, // pending
-
-            'tst_status'         => 1, // pending
+            'tst_payment_status' => 1,
+            'tst_status'         => 1,
             'tst_created_by'     => Auth::user()->usr_id,
             'tst_updated_by'     => Auth::user()->usr_id,
+            'tst_expires_at' => now()->addMinutes(30),
         ]);
 
-        // Simpan item
         TransactionItem::create([
             'tst_item_transaction_id' => $transaction->tst_id,
             'tst_item_product_id'     => $product->prd_id,
@@ -180,7 +176,7 @@ class TransactionController extends Controller
 
         // Buat transaksi
         $transaction = Transaction::create([
-            'tst_invoice'        => 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
+            'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'tst_buyer_id'       => Auth::user()->usr_id,
             'tst_seller_id'      => $sellerId,
             'tst_subtotal'       => $subtotal,
@@ -264,8 +260,16 @@ class TransactionController extends Controller
         $transaction = Transaction::with(['items', 'buyer', 'seller', 'shipment'])
             ->findOrFail($id);
 
-        return view('livewire.admin.transaction.show', compact('transaction'));
+        return view('livewire.admin.transaction.detail', compact('transaction'));
     }
+    public function actions($id)
+    {
+        $transaction = Transaction::with(['items', 'buyer', 'seller', 'shipment'])
+            ->findOrFail($id);
+
+        return view('livewire.admin.transaction.actions', compact('transaction'));
+    }
+
 
     public function adminConfirmPayment($id)
     {

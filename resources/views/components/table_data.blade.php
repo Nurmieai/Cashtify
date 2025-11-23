@@ -1,111 +1,88 @@
+@props([
+    'paginator' => null,
+    'title' => '',
+])
+
 @php
-    if (isset($paginator)) {
-        $totalPages = $paginator->lastPage() ?? '';
-        $currentPage = $paginator->currentPage() ?? '';
+    if ($paginator) {
+        $totalPages = $paginator->lastPage();
+        $currentPage = $paginator->currentPage();
         $start = max(1, $currentPage - 2);
         $end = min($totalPages, $currentPage + 2);
     } else {
-        $totalPages = 0;
-        $currentPage = 0;
-        $start = max(1, $currentPage - 2);
-        $end = min($totalPages, $currentPage + 2);
+        $totalPages = $currentPage = $start = $end = 0;
     }
 
-    // ambil semua query string yang ada kecuali 'page'
+    // ambil query string kecuali page
     $queryParams = request()->except('page');
     $queryString = count($queryParams) ? '&' . http_build_query($queryParams) : '';
 @endphp
 
 <div class="card mb-4">
-    <div class="card-header">
-        <h3 class="card-title">{{ $title }}</h3>
-        <div class="card-tools">
-            <ul class="pagination p-2 pagination-sm float-end">
-                {{-- Tombol Previous --}}
-                @if ($paginator)
-                    @if ($paginator->onFirstPage())
-                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $paginator->url(1) }}{{ $queryString }}" rel="prev">&laquo;</a>
-                        </li>
-                    @endif
 
-                    {{-- Nomor Halaman --}}
-                    @for ($i = $start; $i <= $end; $i++)
-                        @if ($i == $currentPage)
-                            <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $paginator->url($i) }}{{ $queryString }}">{{ $i }}</a>
-                            </li>
-                        @endif
-                    @endfor
+    {{-- Header + Pagination (atas) --}}
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">{{ $title }}</h3>
 
-                    {{-- Tombol Next --}}
-                    @if ($paginator->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $paginator->url($totalPages) }}{{ $queryString }}" rel="next">&raquo;</a>
-                        </li>
-                    @else
-                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                    @endif
-                @else
-                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                @endif
-            </ul>
-        </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body p-0" style="overflow-x: auto; white-space: nowrap;">
-        <table class="table" style="min-width: 200px;">
-            <thead>
-                <tr>
-                    {{ $header ?? '' }}
-                </tr>
-            </thead>
-            <tbody>
-                {{ $slot }}
-            </tbody>
-        </table>
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer clearfix">
-        <ul class="pagination pagination-sm float-end">
-            {{-- Tombol Previous --}}
-            @if ($paginator)
-                @if ($paginator->onFirstPage())
-                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $paginator->url(1) }}{{ $queryString }}" rel="prev">&laquo;</a>
-                    </li>
-                @endif
+        @if ($paginator)
+            <ul class="pagination p-2 pagination-sm mb-0">
+                {{-- Prev --}}
+                <li class="page-item {{ $paginator->onFirstPage() ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $paginator->url(1) }}{{ $queryString }}">&laquo;</a>
+                </li>
 
-                {{-- Nomor Halaman --}}
+                {{-- Numbers --}}
                 @for ($i = $start; $i <= $end; $i++)
-                    @if ($i == $currentPage)
-                        <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $paginator->url($i) }}{{ $queryString }}">{{ $i }}</a>
-                        </li>
-                    @endif
+                    <li class="page-item {{ $i == $currentPage ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $paginator->url($i) }}{{ $queryString }}">
+                            {{ $i }}
+                        </a>
+                    </li>
                 @endfor
 
-                {{-- Tombol Next --}}
-                @if ($paginator->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $paginator->url($totalPages) }}{{ $queryString }}" rel="next">&raquo;</a>
-                    </li>
-                @else
-                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                @endif
-            @else
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-            @endif
-        </ul>
+                {{-- Next --}}
+                <li class="page-item {{ !$paginator->hasMorePages() ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $paginator->url($totalPages) }}{{ $queryString }}">&raquo;</a>
+                </li>
+            </ul>
+        @endif
     </div>
+
+    {{-- Table --}}
+    <div class="card-body p-0">
+        <div class="table-responsive" style="overflow-y: visible !important;">
+            <table class="table mb-0">
+                <thead>
+                    <tr>{{ $header }}</tr>
+                </thead>
+                <tbody>
+                    {{ $slot }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Pagination bawah --}}
+    @if ($paginator)
+        <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm float-end mb-0">
+                <li class="page-item {{ $paginator->onFirstPage() ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $paginator->url(1) }}{{ $queryString }}">&laquo;</a>
+                </li>
+
+                @for ($i = $start; $i <= $end; $i++)
+                    <li class="page-item {{ $i == $currentPage ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $paginator->url($i) }}{{ $queryString }}">
+                            {{ $i }}
+                        </a>
+                    </li>
+                @endfor
+
+                <li class="page-item {{ !$paginator->hasMorePages() ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $paginator->url($totalPages) }}{{ $queryString }}">&raquo;</a>
+                </li>
+            </ul>
+        </div>
+    @endif
+
 </div>

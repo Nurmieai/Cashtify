@@ -86,20 +86,6 @@
                             <td>Deskripsi</td>
                             <td>{{ $product->prd_description }}</td>
                         </tr>
-
-                        <tr class="align-middle">
-                            <td>Foto Produk</td>
-                            <td>
-                                @if ($product->prd_card_url)
-                                    <img src="{{ asset($product->prd_card_url) }}"
-                                        class="img-thumbnail"
-                                        style="max-width: 150px;">
-                                @else
-                                    <span class="text-muted">Tidak ada gambar</span>
-                                @endif
-                            </td>
-                        </tr>
-
                         <tr class="align-middle">
                             <td>Dibuat oleh</td>
                             <td>{{ $product->creator->name ?? '-' }}</td>
