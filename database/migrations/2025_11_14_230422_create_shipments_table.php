@@ -32,6 +32,11 @@ return new class extends Migration
             $table->unsignedBigInteger('shp_updated_by')->nullable();
             $table->unsignedBigInteger('shp_deleted_by')->nullable();
 
+            $table->text('shp_address')->nullable();
+            $table->decimal('shp_latitude', 10, 7)->nullable();
+            $table->decimal('shp_longitude', 10, 7)->nullable();
+
+
             $table->timestamps();
             $table->softDeletes();
             $table->string('shp_sys_note')->nullable();

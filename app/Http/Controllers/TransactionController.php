@@ -69,6 +69,10 @@ class TransactionController extends Controller
 
         $transaction = $this->applyStatus($transaction);
 
+        $address = $this->getAddressFromLatLng(
+        $transaction->tst_latitude,
+        $transaction->tst_longitude
+    );
         return view('livewire.user.transaction.invoice', compact('transaction'));
     }
 
@@ -221,66 +225,50 @@ class TransactionController extends Controller
     /**
      * Store transaksi keranjang
      */
-    public function store(Request $request)
+    public function Store(Request $request, $prd_id)
     {
         $request->validate([
-            'address'   => 'required|string|max:500',
-            'latitude'  => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'quantity'        => 'required|integer|min:1',
+            'payment_method'  => 'required|string',
+            'address'         => 'required|string|max:500',
+            'latitude'        => 'nullable|numeric',
+            'longitude'       => 'nullable|numeric',
         ]);
 
-        $cart = Cart::with(['items.product'])
-            ->where('crs_buyer_id', Auth::user()->usr_id)
-            ->where('crs_status', 'active')
-            ->first();
+        $product = Product::findOrFail($prd_id);
+        $buyerId = Auth::user()->usr_id;
+        $sellerId = $product->prd_created_by;
 
-        if (!$cart || $cart->items->isEmpty()) {
-            return back()->with('error', 'Keranjang kosong.');
-        }
+        $qty = $request->quantity;
+        $subtotal = $product->prd_price * $qty;
 
-        // Hitung subtotal
-        $subtotal = 0;
-        foreach ($cart->items as $item) {
-            $subtotal += $item->product->prd_price * $item->crs_item_quantity;
-        }
-
-        $sellerId = $cart->items->first()->product->prd_created_by;
-
-        // Buat transaksi
+        // === CREATE TRANSACTION ==================================
         $transaction = Transaction::create([
             'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
-            'tst_buyer_id'       => Auth::user()->usr_id,
+            'tst_buyer_id'       => $buyerId,
             'tst_seller_id'      => $sellerId,
+
             'tst_subtotal'       => $subtotal,
             'tst_total'          => $subtotal,
-            'tst_payment_method' => 'manual',
-            'tst_payment_status' => 1,
-            'tst_status'         => 1,
-            'tst_created_by'     => Auth::user()->usr_id,
-            'tst_updated_by'     => Auth::user()->usr_id,
+
+            'tst_payment_method' => $request->payment_method,
+            'tst_payment_status' => 'pending',   // default
+            'tst_status'         => 'waiting',   // default
+
+            'tst_created_by'     => $buyerId,
+            'tst_updated_by'     => $buyerId,
         ]);
 
-        // Items
-        foreach ($cart->items as $item) {
-            TransactionItem::create([
-                'tst_item_transaction_id' => $transaction->tst_id,
-                'tst_item_product_id'     => $item->product->prd_id,
-                'tst_item_product_name'   => $item->product->prd_name,
-                'tst_item_quantity'       => $item->crs_item_quantity,
-                'tst_item_price'          => $item->product->prd_price,
-                'tst_item_subtotal'       => $item->product->prd_price * $item->crs_item_quantity,
-            ]);
-        }
-
-        // Kosongkan cart
-        CartItem::where('cri_cart_id', $cart->crs_id)->delete();
-        $cart->update([
-            'crs_total_items' => 0,
-            'crs_total_price' => 0,
-            'crs_status'      => 'checked_out',
+        // === ADD ITEM =============================================
+        TransactionItem::create([
+            'tst_item_transaction_id' => $transaction->tst_id,
+            'tst_item_product_id'     => $product->prd_id,
+            'tst_item_product_name'   => $product->prd_name,
+            'tst_item_quantity'       => $qty,
+            'tst_item_price'          => $product->prd_price,
+            'tst_item_subtotal'       => $subtotal,
         ]);
 
-        // Shipment
         Shipments::create([
             'shp_transaction_id' => $transaction->tst_id,
             'shp_status'         => 'pending',
@@ -290,11 +278,13 @@ class TransactionController extends Controller
             'shp_created_by'     => Auth::user()->usr_id,
         ]);
 
-        // Redirect ke invoice final
+
+        // === REDIRECT ==============================================
         return redirect()
             ->route('checkout.product.invoice', $transaction->tst_id)
             ->with('success', 'Transaksi berhasil dibuat. Lanjutkan pembayaran.');
     }
+
 
     /**
      * Detail transaksi pembeli (show)
@@ -428,4 +418,40 @@ class TransactionController extends Controller
 
         return back()->with('success', 'Pesanan selesai.');
     }
+
+    public function getAddressFromLatLng($lat, $lng)
+    {
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&zoom=18&addressdetails=1";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // WAJIB! Jika tidak → 403 Forbidden
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'User-Agent: MyApp/1.0 (contact: example@gmail.com)'
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if (!$data || !isset($data['address'])) {
+            return [
+                'province' => '-',
+                'city'     => '-',
+                'district' => '-',
+            ];
+        }
+
+        $addr = $data['address'];
+
+        return [
+            'province' => $addr['state']        ?? '-',
+            'city'     => $addr['city']         ?? ($addr['town'] ?? ($addr['village'] ?? '-')),
+            'district' => $addr['suburb']       ?? ($addr['county'] ?? '-'),
+        ];
+    }
+
 }

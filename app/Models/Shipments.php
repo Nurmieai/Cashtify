@@ -13,7 +13,6 @@ class Shipments extends Model
     protected $table = 'shipments';
     protected $primaryKey = 'shp_id';
 
-    // Mass assignable
     protected $fillable = [
         'shp_transaction_id',
         'shp_status',
@@ -23,11 +22,17 @@ class Shipments extends Model
         'shp_sent_at',
         'shp_delivered_at',
         'shp_notes',
+
+        'shp_address',
+        'shp_latitude',
+        'shp_longitude',
+
         'shp_created_by',
         'shp_updated_by',
         'shp_deleted_by',
         'shp_sys_note',
     ];
+
 
     // Custom timestamps
     const CREATED_AT = 'shp_created_at';

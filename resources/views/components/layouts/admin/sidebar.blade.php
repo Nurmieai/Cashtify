@@ -28,24 +28,11 @@
                     Data Pengguna
                 </a>
 
-                <a href="{{ route('posts.index') }}"
-                    class="nav-link {{ set_active('posts.*') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-newspaper"></i></div>
-                    Posting
-                </a>
-
-                <a href="{{ route('locations.index') }}"
-                    class="nav-link {{ set_active('locations.*') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    Lokasi
-                </a>
-
                 <a href="{{ route('accounting.index') }}"
                     class="nav-link {{ set_active('accounting.*') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-calculator"></i></div>
                     Akuntansi
                 </a>
-
             </div>
         </div>
 

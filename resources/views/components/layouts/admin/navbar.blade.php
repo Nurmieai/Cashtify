@@ -16,7 +16,7 @@
             $user = Auth::user();
             $profileImage = $user && $user->usr_card_url
                 ? asset($user->usr_card_url)
-                : asset('assets/images/default_user.png');
+                : asset('assets/images/header/user_placeholder.jpg');
         @endphp
 
         <li class="nav-item dropdown">

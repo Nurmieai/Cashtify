@@ -52,7 +52,7 @@
 
   let offset = 0;
   let isPaused = false;
-  const speed = 2; // kecepatan geser
+  const speed = 1; // kecepatan geser
 
   function loop() {
     if (!isPaused) {

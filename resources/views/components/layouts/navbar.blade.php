@@ -49,7 +49,7 @@
                         $user = Auth::user();
                         $profileImage = $user->usr_card_url
                             ? asset($user->usr_card_url)
-                            : asset('assets/images/default_user.png');
+                            : asset('assets/images/header/user_placeholder.jpg');
                     @endphp
 
                     <div class="dropdown">

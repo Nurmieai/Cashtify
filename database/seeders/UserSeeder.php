@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name'          => 'Penjual Utama',
                 'password'      => Hash::make('12345'),
-                'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                'usr_card_url'  => 'assets/images/header/user_placeholder.jpg',
                 'usr_sys_note'  => 'Penjual / Admin utama sistem kasir',
             ]
         );
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             [
                 'name'          => 'Sofia',
                 'password'      => Hash::make('12345'),
-                'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                'usr_card_url'  => 'assets/images/header/user_placeholder.jpg',
                 'usr_sys_note'  => 'User pembeli standar',
             ]
         );
@@ -81,7 +81,7 @@ class UserSeeder extends Seeder
                 [
                     'name'          => $data['name'],
                     'password'      => Hash::make('12345'),
-                    'usr_card_url'  => 'assets/images/header/hero-image.jpg',
+                    'usr_card_url'  => 'assets/images/header/user_placeholder.jpg',
                     'usr_sys_note'  => 'Akun dummy untuk testing',
                 ]
             );
