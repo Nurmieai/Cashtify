@@ -104,11 +104,9 @@ class Transaction extends Model
 
     public function canBeConfirmed()
     {
-        // hanya bisa dikonfirmasi bila buyer sudah bayar
         return (int)$this->tst_payment_status === 2;
     }
 
-    // =============== AUDIT USER ===============
     public function creator()
     {
         return $this->belongsTo(User::class, 'tst_created_by', 'usr_id');

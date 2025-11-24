@@ -35,7 +35,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/MenuHelper.php"
+            "app/Helpers/MenuHelper.php",
+            "app/Helpers/TransactionStatus.php"
         ]
     },
     "autoload-dev": {
@@ -54,12 +55,12 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-        "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names=server,queue,vite --kill-others",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names=server,queue,vite --kill-others",
             "npm run dev"
         ],
         "build": [
-        "npm run build"
-    ],
+            "npm run build"
+        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"

@@ -1,48 +1,45 @@
 <x-layouts.app>
     <x-slot name="title">Landing Page</x-slot>
-    @section('title', 'Landing Page')
 
     <!-- SECTION: PRODUK TERPOPULER -->
-    <section class="py-4" id="Products" style="scroll-margin-top: 80px; margin-top: 130px;">
+    <section class="py-4" id="ProductsPopular" style="scroll-margin-top: 80px; margin-top: 130px;">
         <div class="container">
             <h4 class="fw-bold mb-4 text-center text-danger">
                 &gt; Produk Terpopuler &lt;
             </h4>
+
             <div class="product-slider">
                 <div class="product-track d-flex">
                     @forelse ($products as $product)
                         <div class="cards mx-3 product-card">
                             <img src="{{ $product->prd_card_url ? asset($product->prd_card_url) : asset('assets/images/logo.svg') }}"
-                                alt="{{ $product->prd_name }}">
-                                <div class="card-body text-center">
-                                    <h6 class="product-title">
-                                        {{ $product->prd_name }}
-                                    </h6>
-                                    <p class="product-price mb-0">
-                                        Rp {{ number_format($product->prd_price, 0, ',', '.') }}
-                                    </p>
-                                </div>
+                                 alt="{{ $product->prd_name }}">
+                            <div class="card-body text-center">
+                                <h6 class="product-title">
+                                    {{ $product->prd_name }}
+                                </h6>
+                                <p class="product-price mb-0">
+                                    Rp {{ number_format($product->prd_price, 0, ',', '.') }}
+                                </p>
                             </div>
-                        @empty
-                            <p class="text-muted">Tidak ada produk tersedia.</p>
-                        @endforelse
-                    </div>
+                        </div>
+                    @empty
+                        <p class="text-muted">Tidak ada produk tersedia.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
     </section>
 
     <!-- GRID PRODUK SEMUA -->
-    <section class="py-5" id="Products" style="scroll-margin-top: 80px; margin-top: 50px;">
+    <section class="py-5" id="ProductsAll" style="scroll-margin-top: 80px; margin-top: 50px;">
         <div class="container">
-
             <h4 class="fw-bold mb-4 text-center text-danger">
                 &gt; Semua Produk &lt;
             </h4>
 
             @if($products->count() > 0)
                 <div class="row justify-content-center g-4">
-
                     @foreach ($products as $product)
                         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch">
 
@@ -75,7 +72,7 @@
                                     </div>
 
                                     <p class="mt-2 small text-muted">
-                                        {{ Str::limit($product->prd_description, 60) }}
+                                        {{ \Illuminate\Support\Str::limit($product->prd_description, 60) }}
                                     </p>
                                 </div>
 
@@ -88,11 +85,9 @@
                                 <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
                                     <!-- HEADER MODAL -->
-                                    <div class="modal-header py-3 text-white"
-                                         style="background-color: #c82333;">
-                                        <h5 class="modal-title fw-semibold">Detail Produk</h5>
-                                        <button type="button" class="btn-close btn-close-white"
-                                                data-bs-dismiss="modal"></button>
+                                    <div class="modal-header py-3 text-white" style="background-color: #c82333;">
+                                        <h5 class="modal-title fw-semibold">Detail Produk — {{ $product->prd_name }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
 
                                     <div class="modal-body p-4">
@@ -121,20 +116,26 @@
                                                 @endif
 
                                                 @if (Auth::check() && Auth::user()->hasRole('Pembeli'))
-                                                <div class="d-flex gap-3 mt-3">
-                                                    <button class="btn btn-outline-danger w-50 py-2 rounded-3 fw-semibold">
-                                                        🛒 Tambah
-                                                    </button>
+                                                    <div class="d-flex gap-3 mt-3">
+                                                        <form action="{{ route('cart.add', $product->prd_id) }}" method="POST" class="w-50">
+                                                            @csrf
+                                                            <input type="hidden" name="quantity" value="1">
+                                                            <button type="submit"
+                                                                class="btn btn-outline-danger w-100 py-2 rounded-3 fw-semibold">
+                                                                🛒 Tambah
+                                                            </button>
+                                                        </form>
 
-                                                    <a href="{{ route('checkout.product', $product->prd_id) }}"
-                                                    class="btn btn-danger w-50 py-2 rounded-3 fw-semibold">
-                                                        ⚡ Beli
-                                                    </a>
-                                                </div>
+                                                        <a href="{{ route('checkout.product', $product->prd_id) }}"
+                                                           class="btn btn-danger w-50 py-2 rounded-3 fw-semibold">
+                                                            ⚡ Beli
+                                                        </a>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -146,8 +147,9 @@
 
         </div>
     </section>
-        <section id="Customer-Service" class="py-5 bg-light" style="margin-top: 120px; scroll-margin-top: 240px;">
-            <div class="container">
+
+    <section id="Customer-Service" class="py-5 bg-light" style="margin-top: 130px;margin-bottom: 100px;scroll-margin-top: 290px; scroll-margin-bottom: 250px;">
+        <div class="container">
             <h4 class="fw-bold text-center mb-4 text-danger">Layanan Kami</h4>
             <div class="row g-4 justify-content-center">
                 <div class="col-md-4">

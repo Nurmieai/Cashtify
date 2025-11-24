@@ -14,26 +14,60 @@ use App\Models\Product;
 
 class TransactionController extends Controller
 {
+    private function applyStatus($trx)
+    {
+        if (! $trx) return $trx;
+        try {
+            $trx->status_text  = transactionStatusText($trx->tst_status);
+            $trx->status_color = transactionStatusColor($trx->tst_status);
+        } catch (\Throwable $e) {
+            $statusMap = [
+                1 => 'Menunggu Pembayaran',
+                2 => 'Pembayaran Berhasil',
+                3 => 'Menunggu Konfirmasi Penjual',
+                4 => 'Sedang Dikirim',
+                5 => 'Selesai',
+                6 => 'Dibatalkan',
+            ];
+            $colorMap = [
+                1 => 'warning',
+                2 => 'info',
+                3 => 'secondary',
+                4 => 'secondary',
+                5 => 'success',
+                6 => 'danger',
+            ];
+            $trx->status_text  = $statusMap[$trx->tst_status] ?? 'Status Tidak Dikenal';
+            $trx->status_color = $colorMap[$trx->tst_status] ?? 'dark';
+        }
+
+        // payment_text (tetap manual numeric mapping)
+        $trx->payment_text = match ($trx->tst_payment_status) {
+            1 => 'Menunggu Pembayaran',
+            2 => 'Pembayaran Berhasil',
+            3 => 'Pembayaran Gagal',
+            default => 'Status Tidak Dikenal'
+        };
+
+        return $trx;
+    }
+
     // =================== BUYER ===================
 
-    /**
-     * Halaman checkout 1 produk
-     */
     public function productCheckout($prd_id)
     {
         $product = Product::findOrFail($prd_id);
         return view('livewire.user.transaction.checkout', compact('product'));
     }
 
-    /**
-     * Tampilkan invoice transaksi (setelah transaksi dibuat)
-     */
     public function productInvoice($id)
     {
         $transaction = Transaction::with(['items', 'shipment'])
             ->where('tst_id', $id)
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->firstOrFail();
+
+        $transaction = $this->applyStatus($transaction);
 
         return view('livewire.user.transaction.invoice', compact('transaction'));
     }
@@ -44,12 +78,10 @@ class TransactionController extends Controller
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->firstOrFail();
 
-        // Jika sudah dibayar
         if ($transaction->tst_payment_status == 2) {
             return back()->with('info', 'Pembayaran sudah selesai.');
         }
 
-        // Update status pembayaran
         $transaction->update([
             'tst_payment_status' => 2, // 2 = success
             'tst_status'         => 2, // misalnya "paid"
@@ -59,6 +91,43 @@ class TransactionController extends Controller
         return redirect()
             ->route('checkout.product.invoice', $transaction->tst_id)
             ->with('success', 'Pembayaran berhasil diselesaikan.');
+    }
+
+    public function indexOrders()
+    {
+        $orders = Transaction::where('tst_buyer_id', Auth::user()->usr_id)
+            ->orderByDesc('tst_created_at')
+            ->paginate(12);
+
+        if (method_exists($orders, 'through')) {
+            $orders = $orders->through(function ($order) {
+                return $this->applyStatus($order);
+            });
+        } else {
+            $orders->getCollection()->transform(function ($order) {
+                return $this->applyStatus($order);
+            });
+        }
+
+        return view('livewire.user.transaction.orders', [
+            'title' => 'Pesanan Saya',
+            'orders' => $orders
+        ]);
+    }
+
+    public function detailOrders($id)
+    {
+        $order = Transaction::with(['items.product', 'seller'])
+            ->where('tst_buyer_id', Auth::user()->usr_id)
+            ->where('tst_id', $id)
+            ->firstOrFail();
+
+        $order = $this->applyStatus($order);
+
+        return view('livewire.user.transaction.orders-detail', [
+            'title' => 'Detail Pesanan',
+            'order' => $order
+        ]);
     }
 
     public function productStore(Request $request, $prd_id)
@@ -88,7 +157,7 @@ class TransactionController extends Controller
             'tst_status'         => 1,
             'tst_created_by'     => Auth::user()->usr_id,
             'tst_updated_by'     => Auth::user()->usr_id,
-            'tst_expires_at' => now()->addMinutes(30),
+            'tst_expires_at'     => now()->addMinutes(30),
         ]);
 
         TransactionItem::create([
@@ -117,14 +186,17 @@ class TransactionController extends Controller
     }
 
     /**
-     * Riwayat transaksi pembeli
+     * Riwayat / list transaksi pembeli (non-paginated view)
      */
     public function index()
     {
         $transactions = Transaction::with(['items', 'shipment'])
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->latest('tst_created_at')
-            ->get();
+            ->get()
+            ->transform(function ($trx) {
+                return $this->applyStatus($trx);
+            });
 
         return view('livewire.user.transaction.index', compact('transactions'));
     }
@@ -225,7 +297,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * Detail transaksi pembeli
+     * Detail transaksi pembeli (show)
      */
     public function show($id)
     {
@@ -234,9 +306,10 @@ class TransactionController extends Controller
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->firstOrFail();
 
+        $transaction = $this->applyStatus($transaction);
+
         return view('livewire.user.transaction.show', compact('transaction'));
     }
-
 
     // =================== ADMIN / SELLER ===================
 
@@ -251,8 +324,25 @@ class TransactionController extends Controller
             $query->where('tst_invoice', 'like', "%$search%");
         }
 
-        $transactions = $query->paginate(12)->withQueryString();
+        $transactions = $query->paginate(12);
+
+        if (method_exists($transactions, 'through')) {
+            $transactions = $transactions->through(fn($t) => $this->applyStatus($t));
+        } else {
+            $transactions->getCollection()->transform(fn($t) => $this->applyStatus($t));
+        }
+
         return view('livewire.admin.transaction.index', compact('transactions'));
+    }
+
+    public function actions($id)
+    {
+        $transaction = Transaction::with(['items', 'buyer', 'seller', 'shipment'])
+            ->findOrFail($id);
+
+        $transaction = $this->applyStatus($transaction);
+
+        return view('livewire.admin.transaction.actions', compact('transaction'));
     }
 
     public function adminShow($id)
@@ -260,26 +350,32 @@ class TransactionController extends Controller
         $transaction = Transaction::with(['items', 'buyer', 'seller', 'shipment'])
             ->findOrFail($id);
 
+        $transaction = $this->applyStatus($transaction);
+
         return view('livewire.admin.transaction.detail', compact('transaction'));
     }
-    public function actions($id)
-    {
-        $transaction = Transaction::with(['items', 'buyer', 'seller', 'shipment'])
-            ->findOrFail($id);
-
-        return view('livewire.admin.transaction.actions', compact('transaction'));
-    }
-
 
     public function adminConfirmPayment($id)
     {
         $transaction = Transaction::findOrFail($id);
 
-        if ($transaction->tst_payment_status == 'success') {
+        // Jika sudah sukses (gunakan numeric check sesuai model lama)
+        if ($transaction->tst_payment_status == 2) {
             return back()->with('info', 'Pembayaran sudah dikonfirmasi.');
         }
 
-        $transaction->markPaymentSuccess(Auth::user()->usr_id);
+        // Jika kamu punya method markPaymentSuccess di model, pakai itu.
+        // Tetap panggil agar behaviour tetap sama
+        if (method_exists($transaction, 'markPaymentSuccess')) {
+            $transaction->markPaymentSuccess(Auth::user()->usr_id);
+        } else {
+            // fallback: update langsung
+            $transaction->update([
+                'tst_payment_status' => 2,
+                'tst_status'         => 2, // paid
+                'tst_updated_by'     => Auth::user()->usr_id,
+            ]);
+        }
 
         return back()->with('success', 'Pembayaran dikonfirmasi.');
     }
@@ -288,7 +384,10 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::findOrFail($id);
 
-        $transaction->markPaymentCancelled(Auth::user()->usr_id);
+        if (method_exists($transaction, 'markPaymentCancelled')) {
+            $transaction->markPaymentCancelled(Auth::user()->usr_id);
+        }
+
         $transaction->update([
             'tst_status'     => 6,
             'tst_updated_by' => Auth::user()->usr_id,

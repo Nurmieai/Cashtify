@@ -29,7 +29,7 @@
                <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
                   data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
                <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary" aria-labelledby="menuDropdown">
-                 <li><a class="dropdown-item" href="#Orders">Pesanan Saya</a></li>
+                 <li><a class="dropdown-item" href="{{ route('orders') }}">Pesanan Saya</a></li>
                  <li><a class="dropdown-item" href="#Carts">Keranjang Saya</a></li>
                  <li><a class="dropdown-item" href="#Notification">Notifikasi</a></li>
                </ul>

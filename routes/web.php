@@ -27,9 +27,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:Penjual'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-
     Route::prefix('transactions')->name('transactions.')->group(function () {
         Route::get('/', [TransactionController::class, 'adminIndex'])->name('index');
         Route::get('/create', [TransactionController::class, 'create'])->name('create');
@@ -40,7 +37,13 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
 
 Route::middleware(['auth', 'role:Pembeli'])->group(function () {
 
-    // Halaman checkout 1 produk
+    Route::get('/orders', [TransactionController::class, 'indexOrders'])->name('orders');
+    Route::get('/orders/{id}', [TransactionController::class, 'detailOrders'])->name('orders.detail');
+
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+
+
     Route::get('/checkout/{id}',
         [TransactionController::class, 'productCheckout']
     )->name('checkout.product');
@@ -62,6 +65,11 @@ Route::middleware(['auth', 'role:Pembeli'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () {
+
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [TransactionController::class, 'adminIndex'])->name('index');
+        Route::get('/{id}', [TransactionController::class, 'adminShow'])->name('show');
+    });
 
     Route::get('/transactions',
         [TransactionController::class, 'adminIndex']
@@ -105,11 +113,6 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
     });
 
     Route::get('/users', [AuthController::class, 'index'])->name('users.index');
-
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [TransactionController::class, 'adminIndex'])->name('index');
-        Route::get('/{id}', [TransactionController::class, 'adminShow'])->name('show');
-    });
 
     Route::prefix('posts')->name('posts.')->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('index');

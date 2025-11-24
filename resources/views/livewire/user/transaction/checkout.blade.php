@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.tst>
     <x-slot name="title">Checkout</x-slot>
     @section('title', 'Checkout')
 
@@ -100,4 +100,4 @@
         });
     </script>
 
-</x-layouts.app>
+</x-layouts.tst>

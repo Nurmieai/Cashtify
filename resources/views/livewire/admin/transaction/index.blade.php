@@ -34,7 +34,7 @@
             <tr class="text-center">
                 <td>{{ $loop->iteration }}</td>
                 <td class="fw-semibold">{{ $trx->tst_invoice }}</td>
-                <td>{{ $trx->buyer->usr_name ?? '-' }}</td>
+                <td>{{ $trx->buyer->name ?? '-' }}</td>
                 <td>{{ $trx->items->count() }}</td>
                 <td>Rp{{ number_format($trx->tst_total, 0, ',', '.') }}</td>
 

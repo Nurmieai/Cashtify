@@ -28,7 +28,7 @@
 
                         <div class="row mb-2">
                             <div class="col-4 text-muted">Pembeli</div>
-                            <div class="col-8">{{ $transaction->buyer->usr_name ?? '-' }}</div>
+                            <div class="col-8">{{ $transaction->buyer->name ?? '-' }}</div>
                         </div>
 
                         <div class="row mb-2">
