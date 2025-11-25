@@ -23,8 +23,9 @@ return new class extends Migration
             $table->integer('tst_shipping_cost')->default(0);
             $table->string('tst_payment_method');
             $table->timestamp('tst_expires_at')->nullable()->after('tst_payment_method');
-            $table->enum('tst_payment_status', ['1','2','3','4'])->default('1');
-            $table->enum('tst_status', ['1','2','3','4','5','6','7'])->default('1');
+            $table->enum('tst_payment_status', ['pending','paid'])->default('pending');
+            $table->enum('tst_status', ['pending', 'paid', 'verified', 'sent', 'done', 'cancelled','waiting',
+            ])->default('pending');
             $table->string('tst_shipping_service')->nullable();
             $table->string('tst_shipping_courier')->nullable();
             $table->string('tst_tracking_code')->nullable();

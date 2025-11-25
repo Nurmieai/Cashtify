@@ -116,20 +116,27 @@
                                                 @endif
 
                                                 @if (Auth::check() && Auth::user()->hasRole('Pembeli'))
+
+                                                @if (session('success'))
+                                                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                                                        {{ session('success') }}
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    </div>
+                                                @endif
                                                     <div class="d-flex gap-3 mt-3">
-                                                        <form action="{{ route('cart.add', $product->prd_id) }}" method="POST" class="w-50">
+                                                        <form action="{{ route('cart.add') }}" method="POST" class="w-50">
                                                             @csrf
+                                                            <input type="hidden" name="product_id" value="{{ $product->prd_id }}">
                                                             <input type="hidden" name="quantity" value="1">
                                                             <button type="submit"
                                                                 class="btn btn-outline-danger w-100 py-2 rounded-3 fw-semibold">
                                                                 🛒 Tambah
                                                             </button>
                                                         </form>
-
-                                                        <a href="{{ route('checkout.product', $product->prd_id) }}"
-                                                           class="btn btn-danger w-50 py-2 rounded-3 fw-semibold">
-                                                            ⚡ Beli
-                                                        </a>
+                                                            <a href="{{ route('checkout.product', $product->prd_id) }}"
+                                                            class="btn btn-danger w-50 py-2 rounded-3 fw-semibold">
+                                                                ⚡ Beli
+                                                            </a>
                                                     </div>
                                                 @endif
                                             </div>

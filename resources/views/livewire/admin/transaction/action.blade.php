@@ -42,7 +42,6 @@
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Aksi Tersedia</h5>
 
-                {{-- ===================== 1. KONFIRMASI PEMBAYARAN ===================== --}}
                 @if ($transaction->tst_payment_status == 1)
                     @if ($transaction->tst_payment_amount >= $transaction->tst_total)
                         <form action="{{ route('admin.transactions.confirm', $transaction->tst_id) }}" method="POST">
@@ -64,7 +63,6 @@
                     @endif
                 @endif
 
-                {{-- ===================== 2. DIKEMAS ===================== --}}
                 @if ($transaction->tst_status == 2)
                     <form action="{{ route('admin.transactions.pack', $transaction->tst_id) }}" method="POST">
                         @csrf
@@ -74,7 +72,6 @@
                     </form>
                 @endif
 
-                {{-- ===================== 3. KIRIM ===================== --}}
                 @if ($transaction->tst_status == 3)
                     <form action="{{ route('admin.transactions.ship', $transaction->tst_id) }}" method="POST">
                         @csrf
@@ -84,7 +81,6 @@
                     </form>
                 @endif
 
-                {{-- ===================== 4. SELESAI ===================== --}}
                 @if ($transaction->tst_status == 4)
                     <form action="{{ route('admin.transactions.finish', $transaction->tst_id) }}" method="POST">
                         @csrf
@@ -94,7 +90,6 @@
                     </form>
                 @endif
 
-                {{-- ===================== 5. BATALKAN ===================== --}}
                 @if ($transaction->tst_status <= 3)
                     <form action="{{ route('admin.transactions.cancel', $transaction->tst_id) }}" method="POST">
                         @csrf

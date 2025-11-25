@@ -1,9 +1,6 @@
 <x-layouts.admin.main>
     <x-slot name="title">Detail Transaksi - {{ $transaction->tst_invoice }}</x-slot>
-
     <div class="container py-4">
-
-        {{-- ======================= HEADER ======================= --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold mb-0">Detail Transaksi</h3>
             <a href="{{ route('admin.transactions.index') }}" class="btn btn-secondary btn-sm">
@@ -11,10 +8,8 @@
             </a>
         </div>
 
-        {{-- ======================= INFO UTAMA ======================= --}}
         <div class="row g-4">
 
-            {{-- KARTU KIRI — INFORMASI TRANSAKSI --}}
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
@@ -52,27 +47,6 @@
                                 </span>
                             </div>
                         </div>
-
-                        <div class="row mb-2">
-                            <div class="col-4 text-muted">Status Transaksi</div>
-                            <div class="col-8">
-                                @php
-                                    $st = [
-                                        '1' => ['Pending', 'warning'],
-                                        '2' => ['Dibayar', 'success'],
-                                        '3' => ['Dikemas', 'primary'],
-                                        '4' => ['Dikirim', 'info'],
-                                        '5' => ['Selesai', 'success'],
-                                        '6' => ['Dibatalkan', 'danger'],
-                                        '7' => ['Refund', 'secondary'],
-                                    ];
-                                @endphp
-                                <span class="badge bg-{{ $st[$transaction->tst_status][1] }}">
-                                    {{ $st[$transaction->tst_status][0] }}
-                                </span>
-                            </div>
-                        </div>
-
                         <div class="row mb-0">
                             <div class="col-4 text-muted">Tanggal Dibuat</div>
                             <div class="col-8">{{ $transaction->tst_created_at }}</div>
@@ -80,7 +54,6 @@
                     </div>
                 </div>
 
-                {{-- ======================= ITEM BARANG ======================= --}}
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">Item Pesanan</h5>
@@ -133,7 +106,6 @@
                 </div>
             </div>
 
-            {{-- ======================= KANAN — PENGIRIMAN ======================= --}}
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">

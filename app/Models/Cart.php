@@ -17,14 +17,16 @@ class Cart extends Model
     const DELETED_AT = 'crs_deleted_at';
 
     protected $fillable = [
-        'crs_time',
-        'crs_user_id',
-        'crs_product_id',
+        'crs_buyer_id',
+        'crs_status',
+        'crs_total_price',
+        'crs_total_items',
         'crs_created_by',
         'crs_updated_by',
         'crs_deleted_by',
         'crs_sys_note',
     ];
+
 
     public function user()
     {
@@ -35,15 +37,13 @@ class Cart extends Model
     {
         return $this->hasMany(CartItem::class, 'crs_item_cart_id', 'crs_id');
     }
-
     public function updateTotals()
     {
         $totalPrice = $this->items()->sum('crs_item_subtotal');
         $totalItems = $this->items()->sum('crs_item_quantity');
-
+        
         $this->crs_total_price = $totalPrice;
         $this->crs_total_items = $totalItems;
         $this->save();
     }
-
 }

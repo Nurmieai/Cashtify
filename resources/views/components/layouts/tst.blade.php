@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="{{ asset('/css/adminlte.min.css') }}">
 </head>
 <body class="d-flex flex-column min-vh-100">
-    
+
     <main class="flex-fill">
         {{ $slot }}
     </main>

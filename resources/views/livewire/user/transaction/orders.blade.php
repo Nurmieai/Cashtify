@@ -1,4 +1,4 @@
-<x-layouts.tst>
+<x-layouts.crs>
     <x-slot:title>{{ $title }}</x-slot:title>
 
     <div class="container py-4" style="max-width: 720px; margin-top: 130px;">
@@ -76,4 +76,4 @@
         </div>
 
     </div>
-</x-layouts.tst>
+</x-layouts.crs>

@@ -11,18 +11,18 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     /**
-     * Show cart details for logged-in buyer.
+     * Show active cart.
      */
     public function index()
     {
-        $buyerId = Auth::id();
+        $buyerId = Auth::user()->usr_id;
 
-        $cart = Cart::with('items')
+        $cart = Cart::with(['items.product'])
             ->where('crs_buyer_id', $buyerId)
             ->where('crs_status', 'active')
             ->first();
 
-        return view('buyer.cart.index', compact('cart'));
+        return view('livewire.user.cart.index', compact('cart'));
     }
 
     /**
@@ -35,8 +35,9 @@ class CartController extends Controller
             'quantity'   => 'required|integer|min:1',
         ]);
 
-        $buyerId = Auth::id();
+        $buyerId = Auth::user()->usr_id;
         $product = Product::findOrFail($request->product_id);
+        $qty     = $request->quantity;
 
         // 1. Find or create active cart
         $cart = Cart::firstOrCreate(
@@ -45,41 +46,38 @@ class CartController extends Controller
                 'crs_status'   => 'active',
             ],
             [
-                'crs_total_items' => 0,
-                'crs_total_price' => 0,
+                'crs_total' => 0,
             ]
         );
 
-        // 2. Find existing item in cart
+        // 2. Existing item?
         $item = CartItem::where('crs_item_cart_id', $cart->crs_id)
             ->where('crs_item_product_id', $product->prd_id)
             ->first();
 
         if ($item) {
-            // Update quantity
-            $item->crs_item_quantity += $request->quantity;
+            // update qty
+            $item->crs_item_quantity += $qty;
             $item->crs_item_subtotal = $item->crs_item_quantity * $item->crs_item_price;
             $item->save();
         } else {
-            // Add new item
+            // create new item
             CartItem::create([
-                'crs_item_cart_id'   => $cart->crs_id,
-                'crs_item_product_id'=> $product->prd_id,
-                'crs_item_product_name' => $product->prd_name,
-                'crs_item_price'     => $product->prd_price,
-                'crs_item_quantity'  => $request->quantity,
-                'crs_item_subtotal'  => $product->prd_price * $request->quantity,
+                'crs_item_cart_id'    => $cart->crs_id,
+                'crs_item_product_id' => $product->prd_id,
+                'crs_item_quantity'   => $qty,
+                'crs_item_price'      => $product->prd_price,
+                'crs_item_subtotal'   => $product->prd_price * $qty,
             ]);
         }
 
-        // 3. Recalculate cart totals
         $cart->updateTotals();
 
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        return redirect()->route('cart')->with('success', 'Produk berhasil ditambahkan ke keranjang.');
     }
 
     /**
-     * Update quantity of a cart item.
+     * Update item quantity.
      */
     public function update(Request $request, $itemId)
     {
@@ -87,40 +85,38 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $item = CartItem::findOrFail($itemId);
+        $item = CartItem::with('cart')->findOrFail($itemId);
 
         $item->crs_item_quantity = $request->quantity;
         $item->crs_item_subtotal = $item->crs_item_price * $request->quantity;
         $item->save();
 
-        // Recalculate cart totals
         $item->cart->updateTotals();
 
         return redirect()->back()->with('success', 'Jumlah produk diperbarui.');
     }
 
     /**
-     * Remove an item from the cart.
+     * Remove item from cart.
      */
     public function remove($itemId)
     {
-        $item = CartItem::findOrFail($itemId);
+        $item = CartItem::with('cart')->findOrFail($itemId);
         $cart = $item->cart;
 
         $item->delete();
 
-        // Recalculate cart totals
         $cart->updateTotals();
 
         return redirect()->back()->with('success', 'Item dihapus dari keranjang.');
     }
 
     /**
-     * Clear the entire cart.
+     * Clear all items in the cart.
      */
     public function clear()
     {
-        $buyerId = Auth::id();
+        $buyerId = Auth::user()->usr_id;
 
         $cart = Cart::where('crs_buyer_id', $buyerId)
             ->where('crs_status', 'active')

@@ -22,10 +22,6 @@ class CartItem extends Model
         'crs_item_quantity',
         'crs_item_price',
         'crs_item_subtotal',
-        'crs_item_created_by',
-        'crs_item_updated_by',
-        'crs_item_deleted_by',
-        'crs_item_sys_note',
     ];
 
     public function cart()

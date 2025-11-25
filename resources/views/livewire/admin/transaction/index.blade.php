@@ -38,7 +38,6 @@
                 <td>{{ $trx->items->count() }}</td>
                 <td>Rp{{ number_format($trx->tst_total, 0, ',', '.') }}</td>
 
-                {{-- Status --}}
                 @php
                     $st = [
                         1 => ['Pending', 'warning'],
@@ -76,7 +75,6 @@
                                 </a>
                             </li>
 
-                            {{-- Konfirmasi Pembayaran --}}
                             @if ($trx->tst_payment_status == 1)
                                 <li>
                                     <form action="{{ route('admin.transactions.confirm', $trx->tst_id) }}"
@@ -87,7 +85,6 @@
                                 </li>
                             @endif
 
-                            {{-- Kirim --}}
                             @if ($trx->tst_status == 3)
                                 <li>
                                     <form action="{{ route('admin.transactions.ship', $trx->tst_id) }}"

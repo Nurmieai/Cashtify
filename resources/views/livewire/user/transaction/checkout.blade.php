@@ -2,51 +2,93 @@
     <x-slot name="title">Checkout</x-slot>
     @section('title', 'Checkout')
 
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <section class="py-5" style="margin-top: 20px; scroll-margin-top: 80px;">
         <div class="container" style="max-width: 800px;">
 
-            <!-- HEADER -->
             <div class="mb-4 text-center">
                 <h3 class="fw-bold">Checkout</h3>
                 <p class="text-muted">Periksa kembali pesanan Anda sebelum melanjutkan pembayaran.</p>
             </div>
 
-            <!-- CARD WRAPPER -->
             <div class="card shadow-sm border-0 rounded-4 p-4">
+                @if ($errors->any())
+                        <div class="alert alert-danger rounded-3 p-3 mb-4">
+                            <strong class="fw-semibold">Ada kesalahan:</strong>
+                            <ul class="mt-2 mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                <!-- FORM CHECKOUT -->
-                <form id="checkoutForm" action="{{ route('checkout.product.store', $product->prd_id) }}" method="POST">
+                    @if (session('error'))
+                        <div class="alert alert-warning rounded-3 p-3 mb-4">
+                            {{ session('error') }}
+                        </div>
+                @endif
+                <form id="checkoutForm"
+                    action="
+                        @if($product)
+                            {{ route('checkout.product.store', $product->prd_id) }}
+                        @else
+                            {{ route('checkout.cart.store') }}
+                        @endif
+                    "
+                    method="POST">
+
                     @csrf
 
-                    <!-- PRODUK -->
-                    <h5 class="fw-semibold mb-3">Detail Produk</h5>
-                    <div class="d-flex align-items-center mb-4">
-                        <img src="{{ $product->prd_card_url ? asset($product->prd_card_url) : asset('assets/images/logo.svg') }}"
-                             class="rounded-3 me-3"
-                             style="width: 100px; height: 100px; object-fit: contain;">
+                    <!-- PRODUK / CART -->
+                    <h5 class="fw-semibold mb-3">Detail Pesanan</h5>
 
-                        <div>
-                            <h6 class="fw-bold mb-1">{{ $product->prd_name }}</h6>
-                            <p class="text-primary fw-semibold mb-0">
-                                Rp {{ number_format($product->prd_price, 0, ',', '.') }}
-                            </p>
+                    @if($product)
+                        <!-- MODE: BELI LANGSUNG -->
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ $product->prd_card_url ? asset($product->prd_card_url) : asset('assets/images/logo.svg') }}"
+                                 class="rounded-3 me-3"
+                                 style="width: 100px; height: 100px; object-fit: contain;">
+
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ $product->prd_name }}</h6>
+                                <p class="text-primary fw-semibold mb-0">
+                                    Rp {{ number_format($product->prd_price, 0, ',', '.') }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- JUMLAH -->
-                    <div class="mb-4">
-                        <label class="fw-semibold mb-2">Jumlah</label>
-                        <input type="number"
-                               name="quantity"
-                               min="1"
-                               value="1"
-                               class="form-control rounded-3 shadow-sm"
-                               style="max-width: 150px;">
-                    </div>
+                        <div class="mb-4">
+                            <label class="fw-semibold mb-2">Jumlah</label>
+                            <input type="number" name="quantity" min="1" value="1"
+                                   class="form-control rounded-3 shadow-sm" style="max-width: 150px;">
+                        </div>
 
+                    @elseif(!empty($cart_items))
+                        <!-- MODE: CHECKOUT KERANJANG -->
+                        <div class="mb-3">
+                            @foreach($cart_items as $item)
+                                <div class="d-flex align-items-center mb-3 p-2 border rounded-3">
+                                    <img src="{{ $item->product->prd_card_url ? asset($item->product->prd_card_url) : asset('assets/images/logo.svg') }}"
+                                         class="rounded-3 me-3"
+                                         style="width: 80px; height: 80px; object-fit: contain;">
+
+                                    <div class="flex-fill">
+                                        <h6 class="fw-bold mb-1">{{ $item->product->prd_name }}</h6>
+                                        <p class="mb-0 text-muted">Qty: {{ $item->crs_item_quantity }}</p>
+                                    </div>
+
+                                    <p class="fw-semibold text-primary mb-0">
+                                        Rp {{ number_format($item->product->prd_price * $item->crs_item_quantity, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+
+                    <!-- LOKASI -->
                     <h5 class="fw-semibold mb-3">Lokasi Pengiriman</h5>
                     <p class="text-muted">Pilih titik lokasi rumah kamu di peta di bawah ini.</p>
 
@@ -59,17 +101,13 @@
 
                     <div id="map" style="height: 300px; border-radius: 12px; margin-bottom: 20px;"></div>
 
-                    <!-- HIDDEN INPUT UNTUK LAT & LNG -->
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
 
-                    <!-- ALAMAT OPSIONAL -->
                     <div class="mb-4">
                         <label class="fw-semibold mb-2">Catatan Alamat (Opsional)</label>
-                        <textarea name="address"
-                                  class="form-control shadow-sm rounded-3"
-                                  rows="3"
-                                  placeholder="Contoh: Rumah pagar putih, dekat pos ronda..."></textarea>
+                        <textarea name="address" class="form-control shadow-sm rounded-3"
+                                  rows="3" placeholder="Contoh: Rumah pagar putih, dekat pos ronda..."></textarea>
                     </div>
 
                     <!-- PEMBAYARAN -->
@@ -100,14 +138,15 @@
                         class="btn btn-danger w-100 py-3 fw-semibold rounded-3 shadow-sm">
                         Konfirmasi Pembayaran
                     </button>
+
                 </form>
 
             </div>
         </div>
     </section>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-
         const options = document.querySelectorAll('.payment-option');
         const inputMethod = document.getElementById('payment_method');
         const form = document.getElementById('checkoutForm');
@@ -140,10 +179,8 @@
         function updateLatLng(lat, lng) {
             document.getElementById("latitude").value = lat;
             document.getElementById("longitude").value = lng;
-
             document.getElementById("loc-lat").innerText = "Latitude: " + lat.toFixed(6);
             document.getElementById("loc-lng").innerText = "Longitude: " + lng.toFixed(6);
-
             fetchCity(lat, lng);
         }
 
@@ -152,28 +189,23 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.address) {
-                        const city =
-                            data.address.city ||
-                            data.address.town ||
-                            data.address.village ||
-                            data.address.suburb ||
-                            data.address.county ||
-                            "-";
-
+                        const city = data.address.city ||
+                                     data.address.town ||
+                                     data.address.village ||
+                                     data.address.suburb ||
+                                     data.address.county ||
+                                     "-";
                         document.getElementById("loc-city").innerText = "Kota: " + city;
                     }
-                })
-                .catch(() => {
-                    document.getElementById("loc-city").innerText = "";
                 });
         }
 
-        marker.on("dragend", function () {
+        marker.on("dragend", () => {
             const pos = marker.getLatLng();
             updateLatLng(pos.lat, pos.lng);
         });
 
-        map.on("click", function (e) {
+        map.on("click", (e) => {
             marker.setLatLng(e.latlng);
             updateLatLng(e.latlng.lat, e.latlng.lng);
         });

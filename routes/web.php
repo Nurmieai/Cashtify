@@ -36,32 +36,20 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Pembeli'])->group(function () {
-
-    Route::get('/orders', [TransactionController::class, 'indexOrders'])->name('orders');
-    Route::get('/orders/{id}', [TransactionController::class, 'detailOrders'])->name('orders.detail');
-
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-
-
-    Route::get('/checkout/{id}',
-        [TransactionController::class, 'productCheckout']
-    )->name('checkout.product');
-
-    // Proses checkout 1 produk
-    Route::post('/checkout/{id}',
-        [TransactionController::class, 'productStore']
-    )->name('checkout.product.store');
-
-    // Halaman invoice
-    Route::get('/invoice/{id}',
-        [TransactionController::class, 'productInvoice']
-    )->name('checkout.product.invoice');
-
-    // Bayar sekarang
-    Route::get('/checkout/{id}/pay',
-        [TransactionController::class, 'payNow']
-    )->name('checkout.product.pay');
+    Route::put('/cart/{id}/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{id}/delete', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/orders', [TransactionController::class, 'indexOrders'])->name('orders');
+    Route::get('/orders/{id}', [TransactionController::class, 'detailOrders'])->name('orders.detail');
+    Route::get('/checkout/cart', [TransactionController::class, 'checkoutCart'])->name('checkout.cart');
+    Route::post('/checkout/cart/store', [TransactionController::class, 'checkoutCartStore'])->name('checkout.cart.store');
+    Route::get('/checkout', [TransactionController::class, 'checkout'])->name('checkout');
+    Route::get('/checkout/{id}', [TransactionController::class, 'productCheckout'])->name('checkout.product');
+    Route::post('/checkout/{id}', [TransactionController::class, 'productStore'])->name('checkout.product.store');
+    Route::get('/invoice/{id}', [TransactionController::class, 'productInvoice'])->name('checkout.product.invoice');
+    Route::get('/checkout/{id}/pay', [TransactionController::class, 'payNow'])->name('checkout.product.pay');
 });
 
 Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () {
@@ -71,29 +59,17 @@ Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () 
         Route::get('/{id}', [TransactionController::class, 'adminShow'])->name('show');
     });
 
-    Route::get('/transactions',
-        [TransactionController::class, 'adminIndex']
-    )->name('admin.transactions.index');
+    Route::get('/transactions', [TransactionController::class, 'adminIndex'])->name('admin.transactions.index');
 
-    Route::get('/transactions/{id}',
-        [TransactionController::class, 'adminShow']
-    )->name('admin.transactions.show');
+    Route::get('/transactions/{id}', [TransactionController::class, 'adminShow'])->name('admin.transactions.show');
 
-    Route::post('/transactions/{id}/confirm-payment',
-        [TransactionController::class, 'adminConfirmPayment']
-    )->name('admin.transactions.confirm');
+    Route::post('/transactions/{id}/confirm-payment', [TransactionController::class, 'adminConfirmPayment'])->name('admin.transactions.confirm');
 
-    Route::post('/transactions/{id}/cancel',
-        [TransactionController::class, 'adminCancelTransaction']
-    )->name('admin.transactions.cancel');
+    Route::post('/transactions/{id}/cancel', [TransactionController::class, 'adminCancelTransaction'])->name('admin.transactions.cancel');
 
-    Route::post('/transactions/{id}/ship',
-        [TransactionController::class, 'adminShipOrder']
-    )->name('admin.transactions.ship');
+    Route::post('/transactions/{id}/ship', [TransactionController::class, 'adminShipOrder'])->name('admin.transactions.ship');
 
-    Route::post('/transactions/{id}/finish',
-        [TransactionController::class, 'adminFinishOrder']
-    )->name('admin.transactions.finish');
+    Route::post('/transactions/{id}/finish', [TransactionController::class, 'adminFinishOrder'])->name('admin.transactions.finish');
 });
 
 Route::middleware(['auth', 'role:Penjual'])->group(function () {

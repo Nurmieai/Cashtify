@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
-use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Shipments;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -41,7 +40,6 @@ class TransactionController extends Controller
             $trx->status_color = $colorMap[$trx->tst_status] ?? 'dark';
         }
 
-        // payment_text (tetap manual numeric mapping)
         $trx->payment_text = match ($trx->tst_payment_status) {
             1 => 'Menunggu Pembayaran',
             2 => 'Pembayaran Berhasil',
@@ -57,8 +55,13 @@ class TransactionController extends Controller
     public function productCheckout($prd_id)
     {
         $product = Product::findOrFail($prd_id);
-        return view('livewire.user.transaction.checkout', compact('product'));
+
+        return view('livewire.user.transaction.checkout', [
+            'product' => $product,
+            'cart_items' => null
+        ]);
     }
+
 
     public function productInvoice($id)
     {
@@ -70,9 +73,10 @@ class TransactionController extends Controller
         $transaction = $this->applyStatus($transaction);
 
         $address = $this->getAddressFromLatLng(
-        $transaction->tst_latitude,
-        $transaction->tst_longitude
-    );
+            $transaction->tst_latitude,
+            $transaction->tst_longitude
+        );
+
         return view('livewire.user.transaction.invoice', compact('transaction'));
     }
 
@@ -205,13 +209,12 @@ class TransactionController extends Controller
         return view('livewire.user.transaction.index', compact('transactions'));
     }
 
-    /**
-     * Checkout keranjang
-     */
-    public function checkout()
+    public function checkoutCart()
     {
+        $buyerId = Auth::user()->usr_id;
+
         $cart = Cart::with(['items.product'])
-            ->where('crs_buyer_id', Auth::user()->usr_id)
+            ->where('crs_buyer_id', $buyerId)
             ->where('crs_status', 'active')
             ->first();
 
@@ -219,55 +222,71 @@ class TransactionController extends Controller
             return redirect()->route('cart')->with('error', 'Keranjang kosong.');
         }
 
-        return view('livewire.user.transaction.checkout', compact('cart'));
+        return view('livewire.user.transaction.checkout', [
+            'product' => null,
+            'cart_items' => $cart->items
+        ]);
     }
 
-    /**
-     * Store transaksi keranjang
-     */
-    public function Store(Request $request, $prd_id)
+
+    public function checkoutCartStore(Request $request)
     {
         $request->validate([
-            'quantity'        => 'required|integer|min:1',
             'payment_method'  => 'required|string',
             'address'         => 'required|string|max:500',
             'latitude'        => 'nullable|numeric',
             'longitude'       => 'nullable|numeric',
         ]);
 
-        $product = Product::findOrFail($prd_id);
         $buyerId = Auth::user()->usr_id;
-        $sellerId = $product->prd_created_by;
 
-        $qty = $request->quantity;
-        $subtotal = $product->prd_price * $qty;
+        $cart = Cart::with(['items.product'])
+            ->where('crs_buyer_id', $buyerId)
+            ->where('crs_status', 'active')
+            ->first();
 
-        // === CREATE TRANSACTION ==================================
+        if (!$cart || $cart->items->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'Keranjang kosong.');
+        }
+
+        $subtotal = $cart->items->sum(fn($item) =>
+            $item->product->prd_price * $item->crs_item_quantity
+        );
+
+        $sellerId = $cart->items->first()->product->prd_created_by;
+
+        // 📌 FIX: gunakan angka, bukan string
         $transaction = Transaction::create([
             'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'tst_buyer_id'       => $buyerId,
             'tst_seller_id'      => $sellerId,
-
             'tst_subtotal'       => $subtotal,
             'tst_total'          => $subtotal,
-
             'tst_payment_method' => $request->payment_method,
-            'tst_payment_status' => 'pending',   // default
-            'tst_status'         => 'waiting',   // default
 
+            // ============================
+            // FIX PENTING
+            // ============================
+            'tst_payment_status' => 1, // pending
+            'tst_status'         => 1, // waiting/payment pending
+            // ============================
+
+            'tst_latitude'       => $request->latitude,
+            'tst_longitude'      => $request->longitude,
             'tst_created_by'     => $buyerId,
-            'tst_updated_by'     => $buyerId,
+            'tst_expires_at'     => now()->addMinutes(30),
         ]);
 
-        // === ADD ITEM =============================================
-        TransactionItem::create([
-            'tst_item_transaction_id' => $transaction->tst_id,
-            'tst_item_product_id'     => $product->prd_id,
-            'tst_item_product_name'   => $product->prd_name,
-            'tst_item_quantity'       => $qty,
-            'tst_item_price'          => $product->prd_price,
-            'tst_item_subtotal'       => $subtotal,
-        ]);
+        foreach ($cart->items as $item) {
+            TransactionItem::create([
+                'tst_item_transaction_id' => $transaction->tst_id,
+                'tst_item_product_id'     => $item->product->prd_id,
+                'tst_item_product_name'   => $item->product->prd_name,
+                'tst_item_quantity'       => $item->crs_item_quantity,
+                'tst_item_price'          => $item->product->prd_price,
+                'tst_item_subtotal'       => $item->product->prd_price * $item->crs_item_quantity,
+            ]);
+        }
 
         Shipments::create([
             'shp_transaction_id' => $transaction->tst_id,
@@ -275,20 +294,18 @@ class TransactionController extends Controller
             'shp_address'        => $request->address,
             'shp_latitude'       => $request->latitude,
             'shp_longitude'      => $request->longitude,
-            'shp_created_by'     => Auth::user()->usr_id,
+            'shp_created_by'     => $buyerId,
         ]);
 
+        $cart->crs_status = 'ordered';
+        $cart->save();
 
-        // === REDIRECT ==============================================
         return redirect()
             ->route('checkout.product.invoice', $transaction->tst_id)
-            ->with('success', 'Transaksi berhasil dibuat. Lanjutkan pembayaran.');
+            ->with('success', 'Checkout berhasil, lanjutkan pembayaran.');
     }
 
 
-    /**
-     * Detail transaksi pembeli (show)
-     */
     public function show($id)
     {
         $transaction = Transaction::with(['items', 'shipment'])
@@ -349,17 +366,13 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::findOrFail($id);
 
-        // Jika sudah sukses (gunakan numeric check sesuai model lama)
         if ($transaction->tst_payment_status == 2) {
             return back()->with('info', 'Pembayaran sudah dikonfirmasi.');
         }
 
-        // Jika kamu punya method markPaymentSuccess di model, pakai itu.
-        // Tetap panggil agar behaviour tetap sama
         if (method_exists($transaction, 'markPaymentSuccess')) {
             $transaction->markPaymentSuccess(Auth::user()->usr_id);
         } else {
-            // fallback: update langsung
             $transaction->update([
                 'tst_payment_status' => 2,
                 'tst_status'         => 2, // paid
