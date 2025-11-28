@@ -105,6 +105,24 @@ class AuthController extends Controller
         return view('livewire.admin.dashboard');
     }
 
+    public function usersPage(Request $request)
+    {
+        $search = $request->search;
+
+        $users = User::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('usr_created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('livewire.admin.users.index', compact('users'));
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

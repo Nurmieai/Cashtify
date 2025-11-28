@@ -139,13 +139,12 @@ class ProductController extends Controller
     public function delete($id)
     {
         $product = Product::findOrFail($id);
-        $product->prd_deleted_by = auth()->id();
-        $product->save();
-
         $product->delete();
 
-        return back()->with('success', 'Produk berhasil dihapus.');
+        return redirect()->route('products.trashed')
+                 ->with('success', 'Produk dipindahkan ke sampah!');
     }
+
 
     public function trashed()
     {

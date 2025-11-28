@@ -53,6 +53,7 @@ Route::middleware(['auth', 'role:Pembeli'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [TransactionController::class, 'adminIndex'])->name('index');
@@ -88,24 +89,15 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
         Route::delete('/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('forceDelete');
     });
 
-    Route::get('/users', [AuthController::class, 'index'])->name('users.index');
+    Route::get('/admin/users', [AuthController::class, 'usersPage'])->name('admin.users');
 
-    Route::prefix('posts')->name('posts.')->group(function () {
-        Route::get('/', [PostController::class, 'index'])->name('index');
-        Route::post('/store', [PostController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [PostController::class, 'edit'])->name('edit');
-        Route::put('/{id}/update', [PostController::class, 'update'])->name('update');
-        Route::delete('/{id}/delete', [PostController::class, 'delete'])->name('delete');
-    });
-
-    Route::prefix('locations')->name('locations.')->group(function () {
-        Route::get('/', [LocationController::class, 'index'])->name('index');
-        Route::post('/store', [LocationController::class, 'store'])->name('store');
-        Route::put('/{id}/update', [LocationController::class, 'update'])->name('update');
-        Route::delete('/{id}/delete', [LocationController::class, 'delete'])->name('delete');
-    });
-
+    // routes/web.php
     Route::prefix('accounting')->name('accounting.')->group(function () {
         Route::get('/', [AccountingController::class, 'index'])->name('index');
+        Route::get('/create', [AccountingController::class, 'create'])->name('create');
+        Route::post('/store', [AccountingController::class, 'store'])->name('store');
+        Route::get('/print', [AccountingController::class, 'print'])->name('print');
+        Route::get('/{id}/pdf', [AccountingController::class, 'exportSingle'])->name('pdf');
     });
+
 });

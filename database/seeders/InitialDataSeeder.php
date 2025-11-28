@@ -73,50 +73,42 @@ class InitialDataSeeder extends Seeder
                     'usr_updated_at' => now(),
                 ]
             );
-            $user->assignRole($pembeliRole);
             $buyers[] = $user->usr_id;
+                }
+
+                $paymentMethods = ['dana', 'bank_transfer'];
+                $paymentStatuses = ['pending', 'paid'];
+                $transactionStatuses = ['pending', 'paid', 'verified', 'sent', 'done', 'cancelled', 'waiting'];
+
+                for ($i = 1; $i <= 15; $i++) {
+
+                    $buyerId  = $buyers[array_rand($buyers)];
+                    $payment  = $paymentMethods[array_rand($paymentMethods)];
+                    $payStat  = $paymentStatuses[array_rand($paymentStatuses)];
+                    $trxStat  = $transactionStatuses[array_rand($transactionStatuses)];
+
+                    $subtotal = rand(20000, 200000);
+                    $invoice  = 'RRQ-' . date('Ymd') . '-' . Str::upper(Str::random(6));
+
+                    DB::table('transactions')->insert([
+                        'tst_invoice'        => $invoice,
+                        'tst_buyer_id'       => $buyerId,
+                        'tst_seller_id'      => $penjualId,
+                        'tst_total'          => $subtotal,
+                        'tst_subtotal'       => $subtotal,
+                        'tst_payment_amount' => 0,                        // WAJIB karena migration ada default
+                        'tst_shipping_cost'  => 0,
+                        'tst_payment_method' => $payment,
+                        'tst_expires_at'     => now()->addDay(),         // WAJIB karena field ada
+                        'tst_payment_status' => $payStat,                // ✔ valid enum string
+                        'tst_status'         => $trxStat,                // ✔ valid enum string
+                        'tst_notes'          => "Dummy transaksi ke-$i",
+                        'tst_created_by'     => $penjualId,
+                        'tst_updated_by'     => $penjualId,
+                        'tst_created_at'     => now()->subDays(rand(1, 60)),
+                        'tst_updated_at'     => now()->subDays(rand(1, 30)),
+                    ]);
         }
-
-        $paymentMethods = ['dana', 'bank_transfer'];
-
-        for ($i = 1; $i <= 15; $i++) {
-            $buyerId = $buyers[array_rand($buyers)];
-            $payment = $paymentMethods[array_rand($paymentMethods)];
-
-            $subtotal = rand(20000, 200000);
-            $invoice = 'RRQ-' . date('Ymd') . '-' . Str::upper(Str::random(6));
-
-            DB::table('transactions')->insert([
-                'tst_invoice' => $invoice,
-                'tst_buyer_id' => $buyerId,
-                'tst_seller_id' => $penjualId,
-                'tst_total' => $subtotal,
-                'tst_subtotal' => $subtotal,
-                'tst_shipping_cost' => 0,
-                'tst_payment_method' => $payment,
-                'tst_payment_status' => '1',    // WAJIB STR, bukan int
-                'tst_status' => '1',            // WAJIB STR
-                'tst_notes' => "Dummy transaksi ke-$i",
-                'tst_created_by' => $penjualId,
-                'tst_updated_by' => $penjualId,
-                'tst_created_at' => now()->subDays(rand(1, 60)),
-                'tst_updated_at' => now()->subDays(rand(1, 30)),
-            ]);
-        }
-
-
-        // ===== ACCOUNTING DEMO =====
-        DB::table('accountings')->insert([
-            'act_user_id' => $penjualId,
-            'act_exel_url' => '',
-            'act_period_from' => now()->startOfMonth()->toDateString(),
-            'act_period_to' => now()->endOfMonth()->toDateString(),
-            'act_total_sales' => $subtotal,
-            'act_total_items_sold' => 2,
-            'act_created_by' => $penjualId,
-            'act_updated_by' => $penjualId,
-            'act_created_at' => now(),
-            'act_updated_at' => now(),
-        ]);
     }
 }
+    

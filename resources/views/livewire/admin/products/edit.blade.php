@@ -14,7 +14,12 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('products.update', $product->prd_id) }}" method="POST" enctype="multipart/form-data">
+
+            {{-- FORM UPDATE (utama) --}}
+            <form id="updateForm"
+                  action="{{ route('products.update', $product->prd_id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -59,7 +64,7 @@
                     @enderror
                 </div>
 
-                {{-- Gambar sebelumnya --}}
+                {{-- Gambar --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold d-block">Foto Produk</label>
 
@@ -71,15 +76,29 @@
                     <input type="file" name="prd_card_url" class="form-control">
                 </div>
 
-                {{-- Tombol --}}
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('products.adminIndex') }}" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-
             </form>
-        </div>
 
+            {{-- HEADER TOMBOL --}}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                {{-- FORM DELETE (harus berdiri sendiri) --}}
+                <form action="{{ route('products.delete', $product->prd_id) }}"
+                      method="POST"
+                      onsubmit="return confirm('Yakin mau hapus produk sementara?')">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-danger">Hapus Produk</button>
+                </form>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('products.adminIndex') }}" class="btn btn-secondary">Kembali</a>
+
+                    {{-- Submit ke form update --}}
+                    <button type="submit" form="updateForm" class="btn btn-primary">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="card-footer small text-muted">
             Dibuat: {{ $product->usr_created_at ?? '-' }} |
             Diubah: {{ $product->usr_updated_at ?? '-' }} |

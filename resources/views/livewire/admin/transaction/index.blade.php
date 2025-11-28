@@ -40,13 +40,13 @@
 
                 @php
                     $st = [
-                        1 => ['Pending', 'warning'],
-                        2 => ['Dibayar', 'success'],
-                        3 => ['Dikemas', 'primary'],
-                        4 => ['Dikirim', 'info'],
-                        5 => ['Selesai', 'success'],
-                        6 => ['Dibatalkan', 'danger'],
-                        7 => ['Refund', 'secondary'],
+                        'pending'   => ['Pending', 'warning'],
+                        'paid'      => ['Dibayar', 'success'],
+                        'verified'  => ['Dikemas', 'primary'],
+                        'sent'      => ['Dikirim', 'info'],
+                        'done'      => ['Selesai', 'success'],
+                        'cancelled' => ['Dibatalkan', 'danger'],
+                        'waiting'   => ['Menunggu Konfirmasi', 'secondary'],
                     ];
                 @endphp
 

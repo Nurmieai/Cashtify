@@ -16,20 +16,20 @@
 
 <x-table_data :paginator="$products" title="Daftar Produk">
 
-    {{-- ========================= HEADER ========================= --}}
     <x-slot:header>
         <div class="d-flex justify-content-between align-items-center w-100 mb-3 mt-4">
-            {{-- Form Search --}}
             <form action="" method="GET" class="d-flex flex-grow">
                     <input type="text" name="search" class="form-control me-2"
                         placeholder="Masukan Nama Produk"
                         value="{{ request('search') }}">
                     <button class="btn btn-outline-success btn-lg"><i class="bi bi-search"></i></button>
                 </form>
-            {{-- Tombol Tambah --}}
             <a href="{{ route('products.create') }}"
                class="btn btn-lg btn-outline-primary ms-2" title="Tambah Produk">
                 <i class="bi bi-plus-lg"></i>
+            </a>
+            <a href="{{ route('products.trashed') }}" class="btn ms-2 btn-lg btn-outline-warning">
+                <i class="bi bi-trash3-fill"></i>
             </a>
         </div>
         {{-- Notifikasi --}}
@@ -41,8 +41,6 @@
         @endif
     </x-slot:header>
 
-
-    {{-- ========================= LIST PRODUK ========================= --}}
     <tr>
         <td colspan="1">
             <div class="row justify-content-center g-4">
