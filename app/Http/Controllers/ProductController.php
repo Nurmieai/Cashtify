@@ -61,7 +61,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'prd_name'        => 'required|string|max:255',
+            'prd_name'        => 'required|string|max:255|unique:products,prd_name',
             'prd_description' => 'required|string',
             'prd_status'      => 'required|in:tersedia,tidak tersedia',
             'prd_price'       => 'required|integer|min:0',
@@ -111,7 +111,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'prd_name'        => 'required|string|max:255',
+            'prd_name'        => 'required|string|max:255|unique:products,prd_name,' . $product->prd_id . ',prd_id',
             'prd_description' => 'required|string',
             'prd_status'      => 'required|in:tersedia,tidak tersedia',
             'prd_price'       => 'required|integer|min:0',

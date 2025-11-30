@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Carbon\Carbon;
 use Spatie\Permission\Models\Role;
 
 class InitialDataSeeder extends Seeder
@@ -109,6 +110,19 @@ class InitialDataSeeder extends Seeder
                         'tst_updated_at'     => now()->subDays(rand(1, 30)),
                     ]);
         }
+        $productLabels = []; 
+        $productStats = [];  
+
+        $startDate = Carbon::now()->subDays(29); 
+
+        for ($i = 0; $i < 30; $i++) {
+            $date = $startDate->copy()->addDays($i);
+            $productLabels[] = $date->format('j M'); 
+
+            $productStats[] = rand(5, 50); 
+        }
+        
+        $this->command->info("Simulasi data chart (30 hari) berhasil dihasilkan dalam scope seeder.");
     }
 }
     

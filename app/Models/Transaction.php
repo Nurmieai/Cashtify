@@ -14,7 +14,7 @@ class Transaction extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    // custom timestamps
+    // Custom Timestamps
     const CREATED_AT = 'tst_created_at';
     const UPDATED_AT = 'tst_updated_at';
     const DELETED_AT = 'tst_deleted_at';
@@ -26,28 +26,28 @@ class Transaction extends Model
 
         'tst_total',
         'tst_subtotal',
-        'tst_discount',
         'tst_shipping_cost',
 
-        // ======= PAYMENT FIELDS LANGSUNG MASUK SINI =======
-        'tst_payment_method',   // cash / transfer / dummy
-        'tst_payment_status',   // pending / success / failed / expired / cancelled
-        'tst_payment_amount',   // nominal
-        'tst_payment_paid_at',  // waktu bayar
+        'tst_payment_method',
+        'tst_payment_status',
+        'tst_payment_amount',
+        'tst_payment_paid_at',
+        'tst_expires_at',
 
-        'tst_status',           // workflow transaksi
+        'tst_status',
+
         'tst_shipping_service',
         'tst_shipping_courier',
         'tst_tracking_code',
-        'tst_notes',
 
+        'tst_notes',
+        'tst_sys_note',
+
+        // Audit Logs
         'tst_created_by',
         'tst_updated_by',
         'tst_deleted_by',
-        'tst_sys_note',
     ];
-
-    // =============== RELATIONSHIPS ===============
 
     public function buyer()
     {
@@ -69,7 +69,20 @@ class Transaction extends Model
         return $this->hasOne(Shipments::class, 'shp_transaction_id', 'tst_id');
     }
 
-    // =============== PAYMENT HELPERS TANPA MODEL PAYMENT ===============
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'tst_created_by', 'usr_id');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'tst_updated_by', 'usr_id');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'tst_deleted_by', 'usr_id');
+    }
 
     public function setPaymentPending($amount, $method = 'manual', $createdBy = null)
     {
@@ -87,8 +100,8 @@ class Transaction extends Model
         $this->update([
             'tst_payment_amount' => $this->tst_total,
             'tst_payment_paid_at' => now(),
-            'tst_payment_status' => 2, // paid
-            'tst_status'          => 2, // transaksi dibayar
+            'tst_payment_status' => 'paid',
+            'tst_status'          => 'paid',
             'tst_updated_by'      => $adminId
         ]);
     }
@@ -96,29 +109,14 @@ class Transaction extends Model
     public function markPaymentCancelled($adminId)
     {
         $this->update([
-            'tst_payment_status' => 3, // failed
-            'tst_status'         => 6, // dibatalkan
+            'tst_payment_status' => 'cancelled',
+            'tst_status'         => 'cancelled',
             'tst_updated_by'     => $adminId
         ]);
     }
 
     public function canBeConfirmed()
     {
-        return (int)$this->tst_payment_status === 2;
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'tst_created_by', 'usr_id');
-    }
-
-    public function updater()
-    {
-        return $this->belongsTo(User::class, 'tst_updated_by', 'usr_id');
-    }
-
-    public function deleter()
-    {
-        return $this->belongsTo(User::class, 'tst_deleted_by', 'usr_id');
+        return $this->tst_payment_status === 'paid';
     }
 }

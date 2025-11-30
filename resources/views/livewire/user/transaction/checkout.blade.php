@@ -105,7 +105,7 @@
                     <input type="hidden" name="longitude" id="longitude">
 
                     <div class="mb-4">
-                        <label class="fw-semibold mb-2">Catatan Alamat (Opsional)</label>
+                        <label class="fw-semibold mb-2">Catatan Alamat (Wajib)</label>
                         <textarea name="address" class="form-control shadow-sm rounded-3"
                                   rows="3" placeholder="Contoh: Rumah pagar putih, dekat pos ronda..."></textarea>
                     </div>

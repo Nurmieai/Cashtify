@@ -92,12 +92,9 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
     Route::get('/admin/users', [AuthController::class, 'usersPage'])->name('admin.users');
 
     // routes/web.php
-    Route::prefix('accounting')->name('accounting.')->group(function () {
+    Route::prefix('admin/accounting')->name('accounting.')->group(function () {
         Route::get('/', [AccountingController::class, 'index'])->name('index');
-        Route::get('/create', [AccountingController::class, 'create'])->name('create');
-        Route::post('/store', [AccountingController::class, 'store'])->name('store');
         Route::get('/print', [AccountingController::class, 'print'])->name('print');
-        Route::get('/{id}/pdf', [AccountingController::class, 'exportSingle'])->name('pdf');
     });
 
 });

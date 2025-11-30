@@ -35,11 +35,11 @@
                             <div class="col-4 text-muted">Status Pembayaran</div>
                             <div class="col-8">
                                 @php
-                                    $pay = [
-                                        '1' => ['Menunggu', 'warning'],
-                                        '2' => ['Dibayar', 'success'],
-                                        '3' => ['Gagal', 'danger'],
-                                        '4' => ['Expired', 'secondary'],
+                                   $pay = [
+                                        'pending' => ['Pending', 'warning'],
+                                        'paid'    => ['Dibayar', 'success'],
+                                        'failed'  => ['Gagal', 'danger'],
+                                        'expired' => ['Expired', 'secondary'],
                                     ];
                                 @endphp
                                 <span class="badge bg-{{ $pay[$transaction->tst_payment_status][1] }}">

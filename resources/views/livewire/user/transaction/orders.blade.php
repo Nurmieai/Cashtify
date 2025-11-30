@@ -17,7 +17,10 @@
 
         <div class="mt-4">
             @foreach ($orders as $order)
-                @php $item = $order->items->first(); @endphp
+                @php
+                    $item = $order->items->first();
+                    $product = $item?->product;
+                @endphp
 
                 <div class="mb-4 border rounded-3 bg-white shadow-sm overflow-hidden">
 
@@ -28,25 +31,30 @@
                     <div class="p-4">
 
                         <div class="text-muted small mb-3">
-                            {{ $order->tst_created_at->format('d F Y, H:i') }}
+                            {{ $order->tst_created_at?->format('d F Y, H:i') }}
                         </div>
 
                         <div class="d-flex align-items-start gap-3 mb-2">
-                            <img src="{{ $item->product->prd_card_url ? asset($item->product->prd_card_url) : asset('assets/images/logo.svg') }}"
+
+                            <img src="{{ $product?->prd_card_url ? asset($product->prd_card_url) : asset('assets/images/logo.svg') }}"
                                  width="80" height="80"
                                  class="rounded border"
                                  style="object-fit: cover">
 
                             <div class="flex-grow-1">
-                                <div class="fw-bold mb-1 fs-6">{{ $item->product->prd_name }}</div>
+
+                                <div class="fw-bold mb-1 fs-6">
+                                    {{ $product->prd_name ?? 'Produk tidak ditemukan' }}
+                                </div>
 
                                 <div class="text-muted small">
-                                    {{ $item->product->prd_category ?? '' }}
+                                    {{ $product->prd_category ?? '' }}
                                 </div>
 
                                 <div class="text-muted small mt-1">
-                                    {{ $item->tsi_quantity }}x {{ $item->product->prd_unit ?? 'Produk' }}
+                                    {{ $item?->tst_item_quantity ?? 0 }}x {{ $product->prd_unit ?? 'Produk' }}
                                 </div>
+
                             </div>
                         </div>
 

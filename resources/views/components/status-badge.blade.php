@@ -1,13 +1,14 @@
-    @props(['status'])
+@props(['status'])
 
 @php
     $map = [
-        1 => ['label' => 'Menunggu Pembayaran',      'color' => 'bg-warning text-dark'],
-        2 => ['label' => 'Pembayaran Berhasil',      'color' => 'bg-success'],
-        3 => ['label' => 'Menunggu Konfirmasi',      'color' => 'bg-secondary'],
-        4 => ['label' => 'Sedang Dikirim',           'color' => 'bg-info text-dark'],
-        5 => ['label' => 'Selesai',                  'color' => 'bg-primary'],
-        6 => ['label' => 'Dibatalkan',               'color' => 'bg-danger'],
+        'pending'   => ['label' => 'Menunggu Pembayaran', 'color' => 'bg-warning text-dark'],
+        'paid'      => ['label' => 'Pembayaran Berhasil', 'color' => 'bg-success'],
+        'verified'  => ['label' => 'Menunggu Konfirmasi', 'color' => 'bg-secondary'],
+        'sent'      => ['label' => 'Sedang Dikirim',      'color' => 'bg-info text-dark'],
+        'done'      => ['label' => 'Selesai',             'color' => 'bg-primary'],
+        'cancelled' => ['label' => 'Dibatalkan',          'color' => 'bg-danger'],
+        'waiting'   => ['label' => 'Menunggu',            'color' => 'bg-warning text-dark'],
     ];
 
     $label = $map[$status]['label'] ?? 'Status Tidak Dikenal';

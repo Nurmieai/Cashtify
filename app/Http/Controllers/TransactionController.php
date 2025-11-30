@@ -15,42 +15,44 @@ class TransactionController extends Controller
 {
     private function applyStatus($trx)
     {
-        if (! $trx) return $trx;
-        try {
-            $trx->status_text  = transactionStatusText($trx->tst_status);
-            $trx->status_color = transactionStatusColor($trx->tst_status);
-        } catch (\Throwable $e) {
-            $statusMap = [
-                1 => 'Menunggu Pembayaran',
-                2 => 'Pembayaran Berhasil',
-                3 => 'Menunggu Konfirmasi Penjual',
-                4 => 'Sedang Dikirim',
-                5 => 'Selesai',
-                6 => 'Dibatalkan',
-            ];
-            $colorMap = [
-                1 => 'warning',
-                2 => 'info',
-                3 => 'secondary',
-                4 => 'secondary',
-                5 => 'success',
-                6 => 'danger',
-            ];
-            $trx->status_text  = $statusMap[$trx->tst_status] ?? 'Status Tidak Dikenal';
-            $trx->status_color = $colorMap[$trx->tst_status] ?? 'dark';
+        if (! $trx) {
+            return $trx;
         }
 
-        $trx->payment_text = match ($trx->tst_payment_status) {
-            1 => 'Menunggu Pembayaran',
-            2 => 'Pembayaran Berhasil',
-            3 => 'Pembayaran Gagal',
-            default => 'Status Tidak Dikenal'
-        };
+        $statusMap = [
+            'pending'  => 'Menunggu Pembayaran',
+            'paid'     => 'Pembayaran Berhasil',
+            'verified' => 'Menunggu Konfirmasi Penjual',
+            'sent'     => 'Sedang Dikirim',
+            'done'     => 'Selesai',
+            'cancelled'=> 'Dibatalkan',
+            'waiting'  => 'Menunggu',
+        ];
+
+        $colorMap = [
+            'pending'  => 'warning',
+            'paid'     => 'info',
+            'verified' => 'secondary',
+            'sent'     => 'secondary',
+            'done'     => 'success',
+            'cancelled'=> 'danger',
+            'waiting'  => 'dark',
+        ];
+
+        $trx->status_text  = $statusMap[$trx->tst_status] ?? 'Status Tidak Dikenal';
+        $trx->status_color = $colorMap[$trx->tst_status] ?? 'dark';
+
+        $paymentMap = [
+            'pending'   => 'Menunggu Pembayaran',
+            'paid'      => 'Pembayaran Berhasil',
+            'failed'    => 'Pembayaran Gagal',
+            'cancelled' => 'Pembayaran Dibatalkan',
+        ];
+
+        $trx->payment_text = $paymentMap[$trx->tst_payment_status] ?? 'Status Tidak Dikenal';
 
         return $trx;
     }
-
-    // =================== BUYER ===================
 
     public function productCheckout($prd_id)
     {
@@ -58,10 +60,9 @@ class TransactionController extends Controller
 
         return view('livewire.user.transaction.checkout', [
             'product' => $product,
-            'cart_items' => null
+            'cart_items' => null,
         ]);
     }
-
 
     public function productInvoice($id)
     {
@@ -73,11 +74,11 @@ class TransactionController extends Controller
         $transaction = $this->applyStatus($transaction);
 
         $address = $this->getAddressFromLatLng(
-            $transaction->tst_latitude,
-            $transaction->tst_longitude
+            $transaction->tst_latitude ?? null,
+            $transaction->tst_longitude ?? null
         );
 
-        return view('livewire.user.transaction.invoice', compact('transaction'));
+        return view('livewire.user.transaction.invoice', compact('transaction', 'address'));
     }
 
     public function payNow($id)
@@ -86,13 +87,13 @@ class TransactionController extends Controller
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->firstOrFail();
 
-        if ($transaction->tst_payment_status == 2) {
+        if ($transaction->tst_payment_status === 'paid') {
             return back()->with('info', 'Pembayaran sudah selesai.');
         }
 
         $transaction->update([
-            'tst_payment_status' => 2, // 2 = success
-            'tst_status'         => 2, // misalnya "paid"
+            'tst_payment_status' => 'paid',
+            'tst_status'         => 'paid',
             'tst_updated_by'     => Auth::user()->usr_id,
         ]);
 
@@ -108,18 +109,14 @@ class TransactionController extends Controller
             ->paginate(12);
 
         if (method_exists($orders, 'through')) {
-            $orders = $orders->through(function ($order) {
-                return $this->applyStatus($order);
-            });
+            $orders = $orders->through(fn($order) => $this->applyStatus($order));
         } else {
-            $orders->getCollection()->transform(function ($order) {
-                return $this->applyStatus($order);
-            });
+            $orders->getCollection()->transform(fn($order) => $this->applyStatus($order));
         }
 
         return view('livewire.user.transaction.orders', [
             'title' => 'Pesanan Saya',
-            'orders' => $orders
+            'orders' => $orders,
         ]);
     }
 
@@ -134,7 +131,7 @@ class TransactionController extends Controller
 
         return view('livewire.user.transaction.orders-detail', [
             'title' => 'Detail Pesanan',
-            'order' => $order
+            'order' => $order,
         ]);
     }
 
@@ -152,7 +149,6 @@ class TransactionController extends Controller
         $quantity = $request->quantity;
         $subtotal = $product->prd_price * $quantity;
 
-        // Buat transaksi
         $transaction = Transaction::create([
             'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'tst_buyer_id'       => Auth::user()->usr_id,
@@ -161,8 +157,8 @@ class TransactionController extends Controller
             'tst_total'          => $subtotal,
             'tst_shipping_cost'  => 0,
             'tst_payment_method' => $request->payment_method,
-            'tst_payment_status' => 1,
-            'tst_status'         => 1,
+            'tst_payment_status' => 'pending',
+            'tst_status'         => 'pending',
             'tst_created_by'     => Auth::user()->usr_id,
             'tst_updated_by'     => Auth::user()->usr_id,
             'tst_expires_at'     => now()->addMinutes(30),
@@ -177,7 +173,6 @@ class TransactionController extends Controller
             'tst_item_subtotal'       => $subtotal,
         ]);
 
-        // Shipment
         Shipments::create([
             'shp_transaction_id' => $transaction->tst_id,
             'shp_status'         => 'pending',
@@ -187,24 +182,18 @@ class TransactionController extends Controller
             'shp_created_by'     => Auth::user()->usr_id,
         ]);
 
-        // Redirect ke invoice final
         return redirect()
             ->route('checkout.product.invoice', $transaction->tst_id)
             ->with('success', 'Invoice berhasil dibuat.');
     }
 
-    /**
-     * Riwayat / list transaksi pembeli (non-paginated view)
-     */
     public function index()
     {
         $transactions = Transaction::with(['items', 'shipment'])
             ->where('tst_buyer_id', Auth::user()->usr_id)
             ->latest('tst_created_at')
             ->get()
-            ->transform(function ($trx) {
-                return $this->applyStatus($trx);
-            });
+            ->transform(fn($trx) => $this->applyStatus($trx));
 
         return view('livewire.user.transaction.index', compact('transactions'));
     }
@@ -218,16 +207,15 @@ class TransactionController extends Controller
             ->where('crs_status', 'active')
             ->first();
 
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return redirect()->route('cart')->with('error', 'Keranjang kosong.');
         }
 
         return view('livewire.user.transaction.checkout', [
             'product' => null,
-            'cart_items' => $cart->items
+            'cart_items' => $cart->items,
         ]);
     }
-
 
     public function checkoutCartStore(Request $request)
     {
@@ -245,7 +233,7 @@ class TransactionController extends Controller
             ->where('crs_status', 'active')
             ->first();
 
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return redirect()->route('cart')->with('error', 'Keranjang kosong.');
         }
 
@@ -255,7 +243,6 @@ class TransactionController extends Controller
 
         $sellerId = $cart->items->first()->product->prd_created_by;
 
-        // 📌 FIX: gunakan angka, bukan string
         $transaction = Transaction::create([
             'tst_invoice'        => 'RRQ-' . date('Ymd') . '-' . strtoupper(Str::random(6)),
             'tst_buyer_id'       => $buyerId,
@@ -263,14 +250,8 @@ class TransactionController extends Controller
             'tst_subtotal'       => $subtotal,
             'tst_total'          => $subtotal,
             'tst_payment_method' => $request->payment_method,
-
-            // ============================
-            // FIX PENTING
-            // ============================
-            'tst_payment_status' => 1, // pending
-            'tst_status'         => 1, // waiting/payment pending
-            // ============================
-
+            'tst_payment_status' => 'pending',
+            'tst_status'         => 'pending',
             'tst_latitude'       => $request->latitude,
             'tst_longitude'      => $request->longitude,
             'tst_created_by'     => $buyerId,
@@ -305,7 +286,6 @@ class TransactionController extends Controller
             ->with('success', 'Checkout berhasil, lanjutkan pembayaran.');
     }
 
-
     public function show($id)
     {
         $transaction = Transaction::with(['items', 'shipment'])
@@ -317,8 +297,6 @@ class TransactionController extends Controller
 
         return view('livewire.user.transaction.show', compact('transaction'));
     }
-
-    // =================== ADMIN / SELLER ===================
 
     public function adminIndex(Request $request)
     {
@@ -366,7 +344,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::findOrFail($id);
 
-        if ($transaction->tst_payment_status == 2) {
+        if ($transaction->tst_payment_status === 'paid') {
             return back()->with('info', 'Pembayaran sudah dikonfirmasi.');
         }
 
@@ -374,8 +352,8 @@ class TransactionController extends Controller
             $transaction->markPaymentSuccess(Auth::user()->usr_id);
         } else {
             $transaction->update([
-                'tst_payment_status' => 2,
-                'tst_status'         => 2, // paid
+                'tst_payment_status' => 'paid',
+                'tst_status'         => 'paid',
                 'tst_updated_by'     => Auth::user()->usr_id,
             ]);
         }
@@ -389,12 +367,13 @@ class TransactionController extends Controller
 
         if (method_exists($transaction, 'markPaymentCancelled')) {
             $transaction->markPaymentCancelled(Auth::user()->usr_id);
+        } else {
+            $transaction->update([
+                'tst_payment_status' => 'cancelled',
+                'tst_status'         => 'cancelled',
+                'tst_updated_by'     => Auth::user()->usr_id,
+            ]);
         }
-
-        $transaction->update([
-            'tst_status'     => 6,
-            'tst_updated_by' => Auth::user()->usr_id,
-        ]);
 
         return back()->with('success', 'Transaksi dibatalkan.');
     }
@@ -403,7 +382,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::with('shipment')->findOrFail($id);
 
-        if (!$transaction->shipment) {
+        if (! $transaction->shipment) {
             return back()->with('error', 'Data pengiriman tidak ditemukan.');
         }
 
@@ -413,7 +392,7 @@ class TransactionController extends Controller
         ]);
 
         $transaction->update([
-            'tst_status'     => 4,
+            'tst_status'     => 'sent',
             'tst_updated_by' => Auth::user()->usr_id,
         ]);
 
@@ -425,7 +404,7 @@ class TransactionController extends Controller
         $transaction = Transaction::findOrFail($id);
 
         $transaction->update([
-            'tst_status'     => 5,
+            'tst_status'     => 'done',
             'tst_updated_by' => Auth::user()->usr_id,
         ]);
 
@@ -440,7 +419,6 @@ class TransactionController extends Controller
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // WAJIB! Jika tidak → 403 Forbidden
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'User-Agent: MyApp/1.0 (contact: example@gmail.com)'
         ]);
@@ -450,7 +428,7 @@ class TransactionController extends Controller
 
         $data = json_decode($response, true);
 
-        if (!$data || !isset($data['address'])) {
+        if (! $data || ! isset($data['address'])) {
             return [
                 'province' => '-',
                 'city'     => '-',
@@ -461,10 +439,9 @@ class TransactionController extends Controller
         $addr = $data['address'];
 
         return [
-            'province' => $addr['state']        ?? '-',
-            'city'     => $addr['city']         ?? ($addr['town'] ?? ($addr['village'] ?? '-')),
-            'district' => $addr['suburb']       ?? ($addr['county'] ?? '-'),
+            'province' => $addr['state'] ?? '-',
+            'city'     => $addr['city'] ?? ($addr['town'] ?? ($addr['village'] ?? '-')),
+            'district' => $addr['suburb'] ?? ($addr['county'] ?? '-'),
         ];
     }
-
 }

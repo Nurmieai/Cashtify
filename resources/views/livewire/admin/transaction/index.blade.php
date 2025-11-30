@@ -14,7 +14,6 @@
 
     img, .card-img-top {
         max-width: 100% !important;
-        height: auto !important;
     }
 </style>
 

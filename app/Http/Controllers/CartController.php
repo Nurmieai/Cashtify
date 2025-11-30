@@ -18,10 +18,15 @@ class CartController extends Controller
         $buyerId = Auth::user()->usr_id;
 
         $cart = Cart::with(['items.product'])
-            ->where('crs_buyer_id', $buyerId)
-            ->where('crs_status', 'active')
-            ->first();
-
+                ->firstOrCreate(
+            [
+                'crs_buyer_id' => $buyerId,
+                'crs_status'   => 'active'
+            ],
+            [
+                'crs_total' => 0
+            ]
+        );
         return view('livewire.user.cart.index', compact('cart'));
     }
 

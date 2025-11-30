@@ -9,9 +9,8 @@
             <span class="text-muted">Update terakhir: {{ now()->format('d M Y H:i') }}</span>
         </div>
 
-        {{-- ================== KARTU STATISTIK ================== --}}
+        {{-- ================== KARTU STATISTIK (Sudah benar) ================== --}}
         <div class="row g-4 mb-4">
-
             <div class="col-md-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body d-flex justify-content-between align-items-center">
@@ -47,13 +46,10 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        {{-- ================== CHARTS ================== --}}
         <div class="row mb-4">
 
-            {{-- BAR --}}
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -69,7 +65,6 @@
                 </div>
             </div>
 
-            {{-- DOUGHNUT --}}
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -82,7 +77,6 @@
         </div>
 
 
-        {{-- ================== TABEL TRANSAKSI ================== --}}
         <div class="card shadow-sm border-0 mb-5">
             <div class="card-body">
 
@@ -106,18 +100,23 @@
                             <tr>
                                 <td class="text-muted">{{ $index + 1 }}</td>
                                 <td class="fw-semibold">{{ $tst->tst_invoice }}</td>
-                                <td>{{ $tst->buyer->usr_name ?? 'Guest' }}</td>
+                                <td>{{ $tst->buyer->name ?? 'Guest' }}</td> {{-- Menggunakan name, bukan usr_name --}}
 
                                 <td>Rp {{ number_format($tst->tst_total, 0, ',', '.') }}</td>
 
                                 <td>
-                                    <span class="badge rounded-pill
-                                        @if($tst->tst_status === 'paid') bg-success
-                                        @elseif($tst->tst_status === 'pending') bg-warning
-                                        @elseif($tst->tst_status === 'failed') bg-danger
-                                        @elseif($tst->tst_status === 'expired') bg-secondary
-                                        @elseif($tst->tst_status === 'cancelled') bg-dark
-                                        @endif">
+                                    {{-- LOGIKA BADGE DISESUAIKAN DENGAN ENUM STRING DI HOME/TRANSACTION CONTROLLER --}}
+                                    @php
+                                        $badgeColor = match($tst->tst_status) {
+                                            'done'      => 'bg-success',
+                                            'paid', 'verified' => 'bg-info', // Sudah bayar/verifikasi
+                                            'sent'      => 'bg-primary', // Sedang dikirim
+                                            'pending', 'waiting' => 'bg-warning',
+                                            'cancelled', 'failed', 'expired' => 'bg-danger',
+                                            default     => 'bg-secondary',
+                                        };
+                                    @endphp
+                                    <span class="badge rounded-pill {{ $badgeColor }}">
                                         {{ ucfirst($tst->tst_status) }}
                                     </span>
                                 </td>
@@ -125,6 +124,7 @@
                                 <td>{{ optional($tst->tst_created_at)->format('d M Y H:i') }}</td>
 
                                 <td>
+                                    {{-- Pastikan route ini benar. Jika ini Admin Dashboard, mungkin routenya admin.orders.show --}}
                                     <a href="{{ route('orders.show', $tst->tst_id) }}"
                                        class="btn btn-sm btn-outline-primary">
                                         Detail
@@ -148,7 +148,7 @@
     </div>
 
 
-    {{-- ================== FOOTER ================== --}}
+    {{-- ================== FOOTER (Tetap Sama) ================== --}}
     <footer class="bg-white border-top py-3 mt-auto">
         <div class="container text-center">
             <small class="text-muted">&copy; 2025 Cashtify. All rights reserved.</small>
@@ -159,14 +159,38 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // BAR CHART
+        // Data dari PHP
+        const productLabels = {!! json_encode(array_keys($productStats)) !!};
+        const productData = {!! json_encode(array_values($productStats)) !!};
+        
+        // DOUGHNUT CHART DATA
+        // Menggunakan array keys dan values dari $tstStatus yang sudah difilter (count > 0)
+        const statusLabels = {!! json_encode(array_keys($tstStatus)) !!}.map(label => label.charAt(0).toUpperCase() + label.slice(1));
+        const statusData = {!! json_encode(array_values($tstStatus)) !!};
+        
+        // Warna untuk status yang disinkronkan
+        const statusColors = {
+            'pending': '#ffc107',   // warning
+            'paid': '#17a2b8',      // info
+            'verified': 'primary',  // secondary/grey
+            'sent': '#007bff',      // primary/blue
+            'done': '#28a745',      // success
+            'cancelled': '#343a40', // dark
+        };
+
+        // Memetakan warna berdasarkan label status yang ada di $tstStatus
+        const backgroundColors = statusLabels.map(label => {
+            return statusColors[label.toLowerCase()] || '#6c757d'; // Default grey
+        });
+
+        // BAR CHART (Produk Terjual 30 Hari Terakhir)
         new Chart(document.getElementById('productChart'), {
             type: 'bar',
             data: {
-                labels: {!! json_encode(array_keys($productStats)) !!},
+                labels: productLabels,
                 datasets: [{
                     label: "Produk Terjual",
-                    data: {!! json_encode(array_values($productStats)) !!},
+                    data: productData,
                     backgroundColor: "rgba(54, 162, 235, 0.6)"
                 }]
             },
@@ -175,22 +199,15 @@
             }
         });
 
-        // DOUGHNUT CHART
+        // DOUGHNUT CHART (Status Transaksi)
         new Chart(document.getElementById('statusChart'), {
             type: 'doughnut',
             data: {
-                labels: ["Paid", "Pending", "Failed", "Expired", "Cancelled"],
+                // Menggunakan labels dan data yang diambil dari PHP
+                labels: statusLabels, 
                 datasets: [{
-                    data: [
-                        {{ $tstStatus['paid'] ?? 0 }},
-                        {{ $tstStatus['pending'] ?? 0 }},
-                        {{ $tstStatus['failed'] ?? 0 }},
-                        {{ $tstStatus['expired'] ?? 0 }},
-                        {{ $tstStatus['cancelled'] ?? 0 }}
-                    ],
-                    backgroundColor: [
-                        "#4CAF50", "#FFC107", "#F44336", "#9E9E9E", "#424242"
-                    ]
+                    data: statusData,
+                    backgroundColor: backgroundColors
                 }]
             },
             options: { cutout: '70%' }

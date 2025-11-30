@@ -22,7 +22,6 @@
                     Transaksi
                 </a>
 
-                {{-- FIXED: pakai "admin.users" biar match --}}
                 <a href="{{ route('admin.users') }}"
                     class="nav-link {{ set_active('admin.users') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
