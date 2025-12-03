@@ -13,6 +13,8 @@
         <h4 class="mb-4 fw-bold">Detail Pesanan</h4>
 
         <div class="order-box p-4 bg-white border rounded-3 shadow-sm">
+
+            {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <div class="fw-bold fs-5">{{ $order->tst_invoice }}</div>
@@ -24,14 +26,15 @@
 
             <hr>
 
+            {{-- ITEM LIST --}}
             @foreach ($order->items as $item)
                 <div class="d-flex gap-3 mb-3">
                     <img src="{{ $item->product->prd_card_url
-                                ? asset($item->product->prd_card_url)
-                                : asset('assets/images/logo.svg') }}"
-                         width="80" height="80"
-                         class="rounded border"
-                         style="object-fit: cover">
+                        ? asset($item->product->prd_card_url)
+                        : asset('assets/images/logo.svg') }}"
+                        width="80" height="80"
+                        class="rounded border"
+                        style="object-fit: cover">
 
                     <div>
                         <div class="fw-bold">{{ $item->product->prd_name }}</div>
@@ -60,11 +63,10 @@
                 </div>
             </div>
 
-            {{-- STATUS PEMBAYARAN STRING --}}
+            {{-- STATUS PEMBAYARAN --}}
             <div class="row mb-3">
                 <div class="col-6 text-muted small">Status Pembayaran</div>
                 <div class="col-6 text-end">
-
                     @php
                         $payStatus = [
                             'pending'   => ['Belum Dibayar', 'bg-warning text-dark'],
@@ -79,9 +81,84 @@
                     @endphp
 
                     <span class="badge {{ $clr }}">{{ $lbl }}</span>
-
                 </div>
             </div>
+
+            <hr>
+
+            {{-- INFORMASI PENGIRIMAN --}}
+            @php
+                $ship = $order->shipment ?? null;
+
+                $shipStatus = [
+                    'pending'   => ['Menunggu Pengiriman', 'bg-secondary'],
+                    'packed'    => ['Dikemas', 'bg-info text-dark'],
+                    'sending'   => ['Dalam Pengiriman', 'bg-primary'],
+                    'delivered' => ['Terkirim', 'bg-success'],
+                    'returned'  => ['Dikembalikan', 'bg-danger'],
+                ];
+            @endphp
+
+            <h6 class="fw-bold mb-2">Informasi Pengiriman</h6>
+
+            @if ($ship)
+                <div class="p-3 border rounded mb-3 bg-light">
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Kurir</span>
+                        <span class="fw-semibold">{{ $ship->shp_courier }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Layanan</span>
+                        <span class="fw-semibold">{{ $ship->shp_service }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Nomor Resi</span>
+                        <span class="fw-semibold">
+                            {{ $ship->shp_tracking_code ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Status</span>
+                        @php
+                            $s  = $ship->shp_status;
+                            $sl = $shipStatus[$s][0] ?? 'Tidak Diketahui';
+                            $sc = $shipStatus[$s][1] ?? 'bg-dark';
+                        @endphp
+                        <span class="badge {{ $sc }}">{{ $sl }}</span>
+                    </div>
+
+                    @if ($ship->shp_sent_at)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Dikirim</span>
+                            <span>{{ \Carbon\Carbon::parse($ship->shp_sent_at)->format('d M Y, H:i') }}</span>
+                        </div>
+                    @endif
+
+                    @if ($ship->shp_delivered_at)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Terkirim</span>
+                            <span>{{ $ship->shp_delivered_at->format('d M Y, H:i') }}</span>
+                        </div>
+                    @endif
+
+                    @if ($ship->shp_notes)
+                        <div class="mt-2">
+                            <div class="text-muted small">Catatan Dari Penjual :</div>
+                            <br>
+                            <div class="fw-semibold">{{ $ship->shp_notes }}</div>
+                        </div>
+                    @endif
+
+                </div>
+            @else
+                <p class="text-muted small">
+                    Belum ada informasi pengiriman. Menunggu proses dari toko.
+                </p>
+            @endif
 
             <hr>
 

@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('usr_img_public_id')->nullable();
             $table->rememberToken();
 
+            $table->integer('usr_dummy_balance')->default(0);
+            $table->enum('usr_dummy_provider', ['dana','bca'])->nullable();
+            $table->string('usr_dummy_account')->nullable();
+
             $table->timestamp('usr_created_at')->nullable();
             $table->timestamp('usr_updated_at')->nullable();
             $table->timestamp('usr_deleted_at')->nullable();

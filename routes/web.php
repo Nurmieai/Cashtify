@@ -71,6 +71,7 @@ Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () 
     Route::post('/transactions/{id}/ship', [TransactionController::class, 'adminShipOrder'])->name('admin.transactions.ship');
 
     Route::post('/transactions/{id}/finish', [TransactionController::class, 'adminFinishOrder'])->name('admin.transactions.finish');
+    Route::post('/admin/transaction/{id}/shipment/save', [TransactionController::class, 'adminShipmentSave'])->name('admin.shipments.save');
 });
 
 Route::middleware(['auth', 'role:Penjual'])->group(function () {

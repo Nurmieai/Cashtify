@@ -12,32 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            // Primary
             $table->bigIncrements('pmt_id');
-
-            // Relation to transactions (tst_id)
             $table->unsignedBigInteger('pmt_tst_id')->index();
-
-            // Generic payment info
             $table->enum('pmt_method', ['cash','midtrans','other'])->default('midtrans');
             $table->integer('pmt_amount')->default(0);
             $table->enum('pmt_status', ['pending','success','failed','expired','cancelled'])->default('pending');
-
-            // Midtrans specific fields (nullable)
             $table->string('pmt_midtrans_order_id')->nullable();
             $table->string('pmt_midtrans_transaction_id')->nullable();
-            $table->string('pmt_payment_type')->nullable(); // e.g. qris, bank_transfer, gopay
-            $table->string('pmt_payment_code')->nullable(); // VA number / qris ref
+            $table->string('pmt_payment_type')->nullable();
+            $table->string('pmt_payment_code')->nullable();
             $table->string('pmt_fraud_status')->nullable();
+            $table->string('pmt_dummy_account')->nullable();
+            $table->enum('pmt_dummy_provider', ['dana','bca'])->nullable();
             $table->bigInteger('pmt_gross_amount')->nullable();
             $table->json('pmt_raw_response')->nullable();
-
-            // Timestamps & audit
             $table->timestamp('pmt_paid_at')->nullable();
-
             $table->timestamps();
             $table->softDeletes();
-
             $table->unsignedBigInteger('pmt_created_by')->unsigned()->nullable();
             $table->unsignedBigInteger('pmt_updated_by')->unsigned()->nullable();
             $table->unsignedBigInteger('pmt_deleted_by')->unsigned()->nullable();

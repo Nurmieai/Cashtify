@@ -340,6 +340,48 @@ class TransactionController extends Controller
         return view('livewire.admin.transaction.detail', compact('transaction'));
     }
 
+    public function adminShipmentSave(Request $request, $id)
+    {
+        $request->validate([
+            'shp_courier'       => 'required|string',
+            'shp_service'       => 'required|string',
+            'shp_tracking_code' => 'required|string',
+            'shp_status'        => 'required|string',
+            'shp_notes'         => 'nullable|string',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+
+        $shipment = $transaction->shipment;
+
+        $payload = [
+            'shp_courier'       => $request->shp_courier,
+            'shp_service'       => $request->shp_service,
+            'shp_tracking_code' => $request->shp_tracking_code,
+            'shp_status'        => $request->shp_status,
+            'shp_notes'         => $request->shp_notes,
+            'shp_updated_by'    => Auth::user()->usr_id,
+        ];
+
+        if ($request->shp_status === 'sending') {
+            $payload['shp_sent_at'] = now();
+        }
+
+        if ($request->shp_status === 'delivered') {
+            $payload['shp_delivered_at'] = now();
+        }
+
+        if ($shipment) {
+            $shipment->update($payload);
+        } else {
+            $payload['shp_transaction_id'] = $id;
+            $payload['shp_created_by']     = Auth::user()->usr_id;
+            Shipments::create($payload);
+        }
+        return back()->with('success', 'Informasi pengiriman berhasil diperbarui.');
+    }
+
+
     public function adminConfirmPayment($id)
     {
         $transaction = Transaction::findOrFail($id);
