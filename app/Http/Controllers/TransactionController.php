@@ -10,6 +10,7 @@ use App\Models\Shipments;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\User;
 
 class TransactionController extends Controller
 {
@@ -83,23 +84,45 @@ class TransactionController extends Controller
 
     public function payNow($id)
     {
-        $transaction = Transaction::where('tst_id', $id)
-            ->where('tst_buyer_id', Auth::user()->usr_id)
-            ->firstOrFail();
+        // ambil user ulang supaya instance-nya full Eloquent
+        $user = User::find(Auth::id());
 
-        if ($transaction->tst_payment_status === 'paid') {
-            return back()->with('info', 'Pembayaran sudah selesai.');
+        if (!$user) {
+            return back()->with('error', 'User tidak ditemukan.');
         }
 
-        $transaction->update([
-            'tst_payment_status' => 'paid',
-            'tst_status'         => 'paid',
-            'tst_updated_by'     => Auth::user()->usr_id,
-        ]);
+        $transaction = Transaction::with(['items', 'shipment'])
+            ->where('tst_id', $id)
+            ->where('tst_buyer_id', $user->usr_id)
+            ->firstOrFail();
 
-        return redirect()
-            ->route('checkout.product.invoice', $transaction->tst_id)
-            ->with('success', 'Pembayaran berhasil diselesaikan.');
+        $wallet = is_array($user->usr_sys_note)
+            ? $user->usr_sys_note
+            : json_decode($user->usr_sys_note, true);
+
+        if (!$wallet) $wallet = ['saldo' => []];
+
+        $method = $transaction->tst_payment_method;
+        $saldo = $wallet['saldo'][$method] ?? 0;
+
+        if ($saldo < $transaction->tst_total) {
+            return back()->with('error', 'Saldo tidak mencukupi.');
+        }
+
+        $wallet['saldo'][$method] -= $transaction->tst_total;
+
+        // simpan wallet
+        $user->usr_sys_note = json_encode($wallet);
+        $user->save(); // <- ini sekarang 100% aman
+
+        // perbaiki status (pakai angka, bukan string)
+        $transaction->tst_payment_status = 'paid';
+        $transaction->tst_status = 'paid';
+        $transaction->save();
+
+
+        return redirect()->route('orders.detail', $transaction->tst_id)
+            ->with('success', 'Pembayaran berhasil!');
     }
 
     public function indexOrders()
@@ -295,7 +318,39 @@ class TransactionController extends Controller
 
         $transaction = $this->applyStatus($transaction);
 
-        return view('livewire.user.transaction.show', compact('transaction'));
+        $wallet = json_decode(Auth::user()->usr_sys_note, true);
+
+        return view('livewire.user.transaction.show', [
+            'transaction' => $transaction,
+            'wallet' => $wallet,
+        ]);
+    }
+
+    public function userIndex()
+    {
+        $transactions = Transaction::where('tst_buyer_id', Auth::user()->usr_id)
+            ->latest()
+            ->get();
+
+        return view('livewire.user.transaction.index', [
+            'transactions' => $transactions,
+            'wallet'       => json_decode(Auth::user()->usr_sys_note, true),
+        ]);
+    }
+
+    public function userShow($id)
+    {
+        $transaction = Transaction::with(['items', 'shipment'])
+            ->where('tst_id', $id)
+            ->where('tst_buyer_id', Auth::user()->usr_id)
+            ->firstOrFail();
+
+        $transaction = $this->applyStatus($transaction);
+
+        return view('livewire.user.transaction.show', [
+            'transaction' => $transaction,
+            'wallet'      => json_decode(Auth::user()->usr_sys_note, true),
+        ]);
     }
 
     public function adminIndex(Request $request)

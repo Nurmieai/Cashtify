@@ -36,20 +36,31 @@ Route::middleware(['auth', 'role:Penjual'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Pembeli'])->group(function () {
+
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/{id}/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{id}/delete', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
     Route::get('/orders', [TransactionController::class, 'indexOrders'])->name('orders');
     Route::get('/orders/{id}', [TransactionController::class, 'detailOrders'])->name('orders.detail');
+
     Route::get('/checkout/cart', [TransactionController::class, 'checkoutCart'])->name('checkout.cart');
     Route::post('/checkout/cart/store', [TransactionController::class, 'checkoutCartStore'])->name('checkout.cart.store');
+
     Route::get('/checkout', [TransactionController::class, 'checkout'])->name('checkout');
     Route::get('/checkout/{id}', [TransactionController::class, 'productCheckout'])->name('checkout.product');
     Route::post('/checkout/{id}', [TransactionController::class, 'productStore'])->name('checkout.product.store');
+
     Route::get('/invoice/{id}', [TransactionController::class, 'productInvoice'])->name('checkout.product.invoice');
     Route::get('/checkout/{id}/pay', [TransactionController::class, 'payNow'])->name('checkout.product.pay');
+
+    Route::prefix('user/transactions')->name('user.transactions.')->group(function () {
+        Route::get('/', [TransactionController::class, 'userIndex'])->name('index');
+        Route::get('/{id}', [TransactionController::class, 'userShow'])->name('show');
+    });
+
 });
 
 Route::middleware(['auth', 'role:Penjual'])->prefix('admin')->group(function () {

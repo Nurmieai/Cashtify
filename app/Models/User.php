@@ -44,6 +44,28 @@ class User extends Authenticatable
         ];
     }
 
+    protected $casts = [
+        'usr_sys_note' => 'array',
+    ];
+
+    public function getWalletAttribute()
+    {
+        if (!$this->usr_sys_note) return null;
+
+        return json_decode($this->usr_sys_note, true);
+    }
+
+    public function getBalance($method)
+    {
+        $wallet = $this->wallet;
+
+        if (!$wallet || !isset($wallet['saldo'][$method])) {
+            return 0;
+        }
+
+        return $wallet['saldo'][$method];
+    }
+
     // Relasi untuk transaksi
     public function transactions(): HasMany
     {
